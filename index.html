@@ -559,15 +559,193 @@
       animation: fadeIn 2s ease 0.8s both;
     }
 
+    /* ===== LIGHT THEME ===== */
+    [data-theme="light"] {
+      --bg: #f8f5ef;
+      --card: #ffffff;
+      --card-hover: #f5f2ec;
+      --accent: #8b6914;
+      --accent-light: #6b4f0a;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --border: #e0dbd2;
+    }
+
+    [data-theme="light"] .card {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    [data-theme="light"] .card:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    }
+
+    [data-theme="light"] .card-img {
+      background: #f0ede6;
+    }
+
+    [data-theme="light"] header h1,
+    [data-theme="light"] .gate-box h1 {
+      background: linear-gradient(135deg, #8b6914, #b8860b, #8b6914);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    [data-theme="light"] .size-note {
+      background: linear-gradient(135deg, rgba(139,105,20,0.08), rgba(139,105,20,0.03));
+      border-color: rgba(139,105,20,0.2);
+    }
+
+    [data-theme="light"] .card-size {
+      background: rgba(0,0,0,0.04);
+    }
+
+    [data-theme="light"] .gate-box input {
+      background: #fff;
+      border-color: #d0c9bc;
+    }
+
+    [data-theme="light"] #gate {
+      background: var(--bg);
+    }
+
+    /* ===== THEME TOGGLE ===== */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 500;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s, background 0.3s, border-color 0.3s;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.15);
+      border-color: var(--accent);
+    }
+
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+
+    .theme-toggle .icon-dark,
+    .theme-toggle .icon-light { display: none; }
+
+    [data-theme="dark"] .theme-toggle .icon-dark { display: block; }
+    [data-theme="light"] .theme-toggle .icon-light { display: block; }
+    :root:not([data-theme]) .theme-toggle .icon-dark { display: block; }
+
+    /* ===== CONFETTI CANVAS ===== */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ===== MOBILE: iPhone-optimerad ===== */
     @media (max-width: 600px) {
-      header h1 { font-size: 2.2rem; }
-      .grid { grid-template-columns: 1fr; }
-      .gate-box h1 { font-size: 1.8rem; }
+      header h1 { font-size: 2rem; }
+      header { padding: 2.5rem 0 2rem; margin-bottom: 2rem; }
+      header .subtitle { font-size: 0.9rem; letter-spacing: 0.05em; }
+      header .note { font-size: 0.8rem; margin-top: 1rem; }
+
+      .gate-box { padding: 2rem 1.5rem; }
+      .gate-box h1 { font-size: 1.6rem; }
+      .gate-box p { font-size: 0.85rem; margin-bottom: 1.5rem; }
+      .gate-box input { width: 200px; font-size: 1rem; padding: 0.9rem 1.2rem; }
+
+      #content { padding: 1rem 1rem 3rem; }
+
+      .grid { grid-template-columns: 1fr; gap: 1rem; }
+
+      .section { margin-bottom: 2.5rem; }
+      .section-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .section-header h2 { font-size: 1.4rem; width: 100%; }
+      .section-desc { font-size: 0.85rem; margin-bottom: 1.5rem; }
+
+      .card-body { padding: 1rem; }
+      .card-body h3 { font-size: 1rem; }
+      .card-body .desc { font-size: 0.8rem; }
+      .card-price { font-size: 1rem; }
+
+      .size-note { padding: 1.2rem; margin-bottom: 2rem; }
+      .size-note h3 { font-size: 1rem; }
+      .size-note p { font-size: 0.82rem; }
+
       .nav-dots { display: none; }
+
+      .back-top { bottom: 1.2rem; right: 1.2rem; width: 38px; height: 38px; }
+      .theme-toggle { top: 0.8rem; right: 0.8rem; width: 40px; height: 40px; font-size: 1rem; }
+
+      /* Snabbare animationer på mobil */
+      .card { animation-duration: 0.4s !important; }
+      .card:nth-child(n+4) { animation-delay: 0.15s !important; }
+
+      footer { padding: 2rem 0; font-size: 0.75rem; }
+    }
+
+    /* Mellan-storlekar (tablet/stor mobil) */
+    @media (min-width: 601px) and (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
+      header h1 { font-size: 2.8rem; }
+      #content { padding: 1.5rem 1.2rem 3rem; }
+    }
+
+    /* Touch-enheter: ta bort hover-effekter som inte fungerar */
+    @media (hover: none) {
+      .card:hover { transform: none; box-shadow: none; }
+      .card:hover .card-img { transform: none; filter: none; }
+      .card:hover .card-body { transform: none; }
+      .card:hover::before { left: -100%; }
+      .card:active { transform: scale(0.98); transition: transform 0.1s; }
+      .card:active .card-img { filter: brightness(1.05); }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Safe area (iPhone notch) */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      footer { padding-bottom: calc(2rem + env(safe-area-inset-bottom)); }
+      .back-top { bottom: calc(1.2rem + env(safe-area-inset-bottom)); }
     }
   </style>
 </head>
-<body>
+<body data-theme="dark">
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle" title="Byt tema">
+    <span class="icon-dark">&#9788;</span>
+    <span class="icon-light">&#9790;</span>
+  </button>
 
   <!-- Password Gate -->
   <div id="gate">
@@ -1712,8 +1890,107 @@
   </div>
 
   <script>
-    // Simple password check
-    // Hash: SHA-256 of the password
+    // ===== CONFETTI SYSTEM =====
+    const Confetti = (() => {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animId = null;
+      const colors = ['#c9a96e','#e4d5b7','#e74c3c','#2ecc71','#8e44ad','#f39c12','#3498db','#fff'];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function createParticle(x, y) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 3 + Math.random() * 6;
+        const size = 4 + Math.random() * 6;
+        const shape = Math.random() > 0.5 ? 'rect' : 'circle';
+        return {
+          x, y,
+          vx: Math.cos(angle) * speed * (0.5 + Math.random()),
+          vy: Math.sin(angle) * speed - 4,
+          size,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 12,
+          gravity: 0.12 + Math.random() * 0.08,
+          drag: 0.98 + Math.random() * 0.015,
+          opacity: 1,
+          shape,
+          life: 120 + Math.random() * 80
+        };
+      }
+
+      function burst(x, y, count) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        for (let i = 0; i < count; i++) {
+          particles.push(createParticle(x, y));
+        }
+        if (!animId) tick();
+      }
+
+      function rain(count) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        for (let i = 0; i < count; i++) {
+          const p = createParticle(Math.random() * canvas.width, -20);
+          p.vy = 2 + Math.random() * 3;
+          p.vx = (Math.random() - 0.5) * 3;
+          p.life = 180 + Math.random() * 120;
+          particles.push(p);
+        }
+        if (!animId) tick();
+      }
+
+      function tick() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.vy += p.gravity;
+          p.vx *= p.drag;
+          p.vy *= p.drag;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rotation += p.rotSpeed;
+          p.life--;
+          p.opacity = Math.min(1, p.life / 30);
+
+          if (p.life <= 0 || p.y > canvas.height + 50) {
+            particles.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation * Math.PI / 180);
+          ctx.globalAlpha = p.opacity;
+          ctx.fillStyle = p.color;
+
+          if (p.shape === 'rect') {
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        if (particles.length > 0) {
+          animId = requestAnimationFrame(tick);
+        } else {
+          animId = null;
+        }
+      }
+
+      return { burst, rain };
+    })();
+
+    // ===== PASSWORD CHECK =====
     const HASH = '2eb0e37fad33ebc118aae2ba8b4d7bc4a7d890c8cf0a63fdf62f885af9a762d2';
 
     async function sha256(str) {
@@ -1725,8 +2002,18 @@
       const pw = document.getElementById('pw').value;
       const hash = await sha256(pw);
       if (hash === HASH) {
-        document.getElementById('gate').classList.add('hidden');
-        document.getElementById('content').classList.add('visible');
+        // Konfetti-explosion vid login!
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        Confetti.burst(cx, cy - 50, 80);
+        setTimeout(() => Confetti.burst(cx - 100, cy, 40), 150);
+        setTimeout(() => Confetti.burst(cx + 100, cy, 40), 300);
+        Confetti.rain(60);
+
+        setTimeout(() => {
+          document.getElementById('gate').classList.add('hidden');
+          document.getElementById('content').classList.add('visible');
+        }, 600);
         sessionStorage.setItem('vg_auth', '1');
       } else {
         document.getElementById('err').classList.add('show');
@@ -1741,7 +2028,22 @@
       document.getElementById('content').classList.add('visible');
     }
 
-    // Back to top button
+    // ===== THEME TOGGLE =====
+    const toggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('vg_theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+
+    toggle.addEventListener('click', () => {
+      const current = document.body.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', next);
+      localStorage.setItem('vg_theme', next);
+      // Mini-konfetti vid temabyte
+      const rect = toggle.getBoundingClientRect();
+      Confetti.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 15);
+    });
+
+    // ===== BACK TO TOP =====
     window.addEventListener('scroll', () => {
       const btn = document.getElementById('backTop');
       if (window.scrollY > 600) {
@@ -1751,8 +2053,8 @@
       }
     });
 
-    // Intersection Observer for scroll-triggered animations
-    const observer = new IntersectionObserver((entries) => {
+    // ===== SCROLL ANIMATIONS + SECTION CONFETTI =====
+    const cardObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.style.animationPlayState = 'running';
@@ -1762,8 +2064,24 @@
 
     document.querySelectorAll('.card').forEach(card => {
       card.style.animationPlayState = 'paused';
-      observer.observe(card);
+      cardObserver.observe(card);
     });
+
+    // Konfetti vid varje ny sektion som scrollas in
+    const sectionConfettiDone = new Set();
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !sectionConfettiDone.has(entry.target)) {
+          sectionConfettiDone.add(entry.target);
+          const rect = entry.target.getBoundingClientRect();
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + 20;
+          Confetti.burst(x, y, 20);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.section-header').forEach(h => sectionObserver.observe(h));
   </script>
 </body>
 </html>
