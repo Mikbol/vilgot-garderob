@@ -27,73 +27,6 @@
       line-height: 1.6;
     }
 
-    /* Password Gate */
-    #gate {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      transition: opacity 0.5s, visibility 0.5s;
-    }
-
-    #gate.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .gate-box {
-      text-align: center;
-      padding: 3rem;
-    }
-
-    .gate-box h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.5rem;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-
-    .gate-box p {
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-      font-size: 0.95rem;
-    }
-
-    .gate-box input {
-      background: var(--card);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      border-radius: 4px;
-      width: 240px;
-      text-align: center;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-
-    .gate-box input:focus {
-      border-color: var(--accent);
-    }
-
-    .gate-box input::placeholder {
-      color: #555;
-    }
-
-    .gate-error {
-      color: #e74c3c;
-      font-size: 0.85rem;
-      margin-top: 0.8rem;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .gate-error.show { opacity: 1; }
-
     /* Main Content */
     #content {
       display: none;
@@ -284,6 +217,125 @@
     .tag-custom { background: #8e44ad; color: #fff; }
     .tag-sold { background: #555; color: #ccc; }
 
+    /* Buy Button */
+    .buy-btn {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.5rem 1.2rem;
+      border-radius: 4px;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      transition: background 0.2s, transform 0.2s;
+      margin-top: 0.6rem;
+    }
+
+    .buy-btn:hover {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+    }
+
+    .buy-btn:active {
+      transform: scale(0.97);
+    }
+
+    [data-theme="light"] .buy-btn {
+      color: #fff;
+    }
+
+    /* Image Carousel */
+    .card-carousel {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      background: #111;
+    }
+
+    .card-carousel .slides {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.3s ease;
+    }
+
+    .card-carousel .slides img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .card-carousel .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 2;
+    }
+
+    .card:hover .arrow,
+    .card-carousel:hover .arrow { opacity: 1; }
+
+    .arrow-left { left: 6px; }
+    .arrow-right { right: 6px; }
+
+    .arrow:hover { background: rgba(0,0,0,0.7); }
+
+    .card-dots {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 5px;
+      z-index: 2;
+    }
+
+    .card-dots .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      transition: background 0.2s, transform 0.2s;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+    }
+
+    .card-dots .dot.active {
+      background: #fff;
+      transform: scale(1.3);
+    }
+
+    /* Single image (no carousel needed) */
+    .card-carousel.single .arrow,
+    .card-carousel.single .card-dots { display: none; }
+
+    @media (hover: none) {
+      .card-carousel .arrow { opacity: 0.7; width: 36px; height: 36px; }
+    }
+
+    @media (max-width: 600px) {
+      .buy-btn { font-size: 0.78rem; padding: 0.5rem 1rem; width: 100%; text-align: center; }
+      .card-carousel .arrow { opacity: 0.6; }
+    }
+
     /* Footer */
     footer {
       text-align: center;
@@ -407,26 +459,6 @@
     /* Tag pulse on hover */
     .card:hover .card-tag {
       animation: pulse 1.5s ease infinite;
-    }
-
-    /* Enhanced gate */
-    .gate-box h1 {
-      background: linear-gradient(135deg, var(--accent), var(--accent-light), var(--accent));
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s linear infinite;
-    }
-
-    .gate-box input {
-      transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
-    }
-
-    .gate-box input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 20px rgba(201,169,110,0.15);
-      transform: scale(1.02);
     }
 
     /* Enhanced header */
@@ -583,8 +615,7 @@
       background: #f0ede6;
     }
 
-    [data-theme="light"] header h1,
-    [data-theme="light"] .gate-box h1 {
+    [data-theme="light"] header h1 {
       background: linear-gradient(135deg, #8b6914, #b8860b, #8b6914);
       background-size: 200% auto;
       -webkit-background-clip: text;
@@ -599,15 +630,6 @@
 
     [data-theme="light"] .card-size {
       background: rgba(0,0,0,0.04);
-    }
-
-    [data-theme="light"] .gate-box input {
-      background: #fff;
-      border-color: #d0c9bc;
-    }
-
-    [data-theme="light"] #gate {
-      background: var(--bg);
     }
 
     /* ===== THEME TOGGLE ===== */
@@ -747,25 +769,13 @@
     <span class="icon-light">&#9790;</span>
   </button>
 
-  <!-- Password Gate -->
-  <div id="gate">
-    <div class="gate-box">
-      <h1>Vilgots Garderob</h1>
-      <p>En privat lookbook</p>
-      <form onsubmit="return checkPass()">
-        <input type="password" id="pw" placeholder="Kod" autofocus>
-      </form>
-      <div class="gate-error" id="err">Fel kod</div>
-    </div>
-  </div>
-
   <!-- Main Content -->
-  <div id="content">
+  <div id="content" class="visible">
     <header>
       <h1>Vilgots Garderob</h1>
       <div class="subtitle">Gentleman Collection</div>
       <div class="note">Kostym, smoking, fluga &amp; hängslen i miniformat. Vardagsplagg med vuxen-vibe.</div>
-      <div class="product-count">55+ plagg kuraterade</div>
+      <div class="product-count">65+ plagg kuraterade</div>
     </header>
 
     <!-- Size Note -->
@@ -785,8 +795,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
-            <img class="card-img" src="img/ttu-classic.jpg" alt="The Tiny Tuxedo Classic">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/ttu-classic.jpg" alt="The Tiny Tuxedo Classic" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-rec">Rekommenderas</span>
               <div class="brand">The Tiny Universe</div>
@@ -796,13 +810,15 @@
                 <span class="card-price">490 kr</span>
                 <span class="card-size">Från 62</span>
               </div>
+            <a class="buy-btn" href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
-            <img class="card-img" src="img/ttu-white.jpg" alt="The Tiny Tuxedo White">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/ttu-white.jpg" alt="The Tiny Tuxedo White" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">The Tiny Universe</div>
               <h3>The Tiny Tuxedo White</h3>
@@ -811,13 +827,15 @@
                 <span class="card-price">490 kr</span>
                 <span class="card-size">Från 62</span>
               </div>
+            <a class="buy-btn" href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
-            <img class="card-img" src="img/ttu-black.jpg" alt="The Tiny Tuxedo Black">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/ttu-black.jpg" alt="The Tiny Tuxedo Black" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">The Tiny Universe</div>
               <h3>The Tiny Tuxedo Black</h3>
@@ -826,13 +844,15 @@
                 <span class="card-price">490 kr</span>
                 <span class="card-size">Från 62</span>
               </div>
+            <a class="buy-btn" href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://thetinyuniverse.com/products/the-casual-suit" target="_blank">
-            <img class="card-img" src="img/ttu-casual.jpg" alt="The Casual Suit">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/ttu-casual.jpg" alt="The Casual Suit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">The Tiny Universe</div>
               <h3>The Casual Suit</h3>
@@ -841,13 +861,15 @@
                 <span class="card-price">420 kr</span>
                 <span class="card-size">Från 62</span>
               </div>
+            <a class="buy-btn" href="https://thetinyuniverse.com/products/the-casual-suit" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
-            <img class="card-img" src="img/ttu-redbow.jpg" alt="The Tiny Tuxedo Red Bow-Tie">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/ttu-redbow.jpg" alt="The Tiny Tuxedo Red Bow-Tie" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">The Tiny Universe</div>
               <h3>The Tiny Tuxedo Red Bow-Tie</h3>
@@ -856,13 +878,15 @@
                 <span class="card-price">420 kr</span>
                 <span class="card-size">Från 62</span>
               </div>
+            <a class="buy-btn" href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
-            <img class="card-img" src="img/ttu-body-bw.jpg" alt="The Tiny Body Tuxedo B&W">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/ttu-body-bw.jpg" alt="The Tiny Body Tuxedo B&W" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-sale">Rea</span>
               <div class="brand">The Tiny Universe</div>
@@ -872,13 +896,15 @@
                 <span class="card-price">190 kr <span class="original">380 kr</span></span>
                 <span class="card-size">Från 62</span>
               </div>
+            <a class="buy-btn" href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
-            <img class="card-img" src="img/ttu-body-white.jpg" alt="The Tiny Body Tuxedo White">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/ttu-body-white.jpg" alt="The Tiny Body Tuxedo White" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-sale">Rea</span>
               <div class="brand">The Tiny Universe</div>
@@ -888,13 +914,15 @@
                 <span class="card-price">190 kr <span class="original">380 kr</span></span>
                 <span class="card-size">Från 62</span>
               </div>
+            <a class="buy-btn" href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
-            <img class="card-img" src="img/ttu-body-black.jpg" alt="The Tiny Body Tuxedo Black">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/ttu-body-black.jpg" alt="The Tiny Body Tuxedo Black" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-sale">Rea</span>
               <div class="brand">The Tiny Universe</div>
@@ -904,10 +932,9 @@
                 <span class="card-price">190 kr <span class="original">380 kr</span></span>
                 <span class="card-size">Från 62</span>
               </div>
+            <a class="buy-btn" href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- LULU BABE -->
@@ -920,8 +947,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://lulubabe.com/products/henry-bow-tie-suspenders-set" target="_blank">
-            <img class="card-img" src="img/lulu-henry-green.jpg" alt="Henry Bow Tie Set Green">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/lulu-henry-green.jpg" alt="Henry Bow Tie Set Green" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-rec">Rekommenderas</span>
               <div class="brand">Lulu Babe</div>
@@ -931,13 +962,15 @@
                 <span class="card-price">~280 kr <span class="original">AUD 39.95</span></span>
                 <span class="card-size">Från 0-3M</span>
               </div>
+            <a class="buy-btn" href="https://lulubabe.com/products/henry-bow-tie-suspenders-set" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://lulubabe.com/products/henry-bow-tie-suspenders-set" target="_blank">
-            <img class="card-img" src="img/lulu-henry-blue.jpg" alt="Henry Bow Tie Set Blue">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/lulu-henry-blue.jpg" alt="Henry Bow Tie Set Blue" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Lulu Babe</div>
               <h3>Henry Set (Blue)</h3>
@@ -946,13 +979,15 @@
                 <span class="card-price">~280 kr</span>
                 <span class="card-size">Från 0-3M</span>
               </div>
+            <a class="buy-btn" href="https://lulubabe.com/products/henry-bow-tie-suspenders-set" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://lulubabe.com/products/levi-tie-suspenders-set" target="_blank">
-            <img class="card-img" src="img/lulu-levi.jpg" alt="Levi Tie & Suspenders Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/lulu-levi.jpg" alt="Levi Tie & Suspenders Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Lulu Babe</div>
               <h3>Levi Tie & Suspenders Set</h3>
@@ -961,13 +996,15 @@
                 <span class="card-price">~240 kr</span>
                 <span class="card-size">Från 0-6M</span>
               </div>
+            <a class="buy-btn" href="https://lulubabe.com/products/levi-tie-suspenders-set" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://lulubabe.com/products/tuxedo-shorts-set" target="_blank">
-            <img class="card-img" src="img/lulu-tuxedo.jpg" alt="Tuxedo Shorts Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/lulu-tuxedo.jpg" alt="Tuxedo Shorts Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Lulu Babe</div>
               <h3>Tuxedo Shorts Set</h3>
@@ -976,10 +1013,9 @@
                 <span class="card-price">~240 kr <span class="original">AUD 33.95</span></span>
                 <span class="card-size">Från 0-6M</span>
               </div>
+            <a class="buy-btn" href="https://lulubabe.com/products/tuxedo-shorts-set" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- CUSTOM -->
@@ -992,8 +1028,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://beeroseboutique.com/products/custom-bow-tie-onesie" target="_blank">
-            <img class="card-img" src="img/beerose-1.png" alt="Custom Bow Tie Onesie">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/beerose-1.png" alt="Custom Bow Tie Onesie" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-custom">Custom med namn</span>
               <div class="brand">Bee Rose Boutique</div>
@@ -1003,13 +1043,15 @@
                 <span class="card-price">~470 kr ($47)</span>
                 <span class="card-size">Prematur-24M</span>
               </div>
+            <a class="buy-btn" href="https://beeroseboutique.com/products/custom-bow-tie-onesie" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://beeroseboutique.com/products/custom-bow-tie-onesie" target="_blank">
-            <img class="card-img" src="img/beerose-2.jpg" alt="Custom Bow Tie Onesie detail">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/beerose-2.jpg" alt="Custom Bow Tie Onesie detail" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-custom">Custom med namn</span>
               <div class="brand">Bee Rose Boutique</div>
@@ -1019,13 +1061,15 @@
                 <span class="card-price">~470 kr ($47)</span>
                 <span class="card-size">Prematur-24M</span>
               </div>
+            <a class="buy-btn" href="https://beeroseboutique.com/products/custom-bow-tie-onesie" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.etsy.com/market/preemie_tuxedo" target="_blank">
-            <img class="card-img" src="img/beerose-3.jpg" alt="Etsy Preemie Tuxedo">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/beerose-3.jpg" alt="Etsy Preemie Tuxedo" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Etsy (flera säljare)</div>
               <h3>Preemie Tuxedo Rompers</h3>
@@ -1034,10 +1078,9 @@
                 <span class="card-price">Varierar</span>
                 <span class="card-size">Preemie+</span>
               </div>
+            <a class="buy-btn" href="https://www.etsy.com/market/preemie_tuxedo" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- CUDDLE SLEEP DREAM -->
@@ -1051,8 +1094,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://cuddlesleepdream.com/products/customize-it-bow-tie-suspender-bodysuit" target="_blank">
-            <img class="card-img" src="img/csd-custom.jpg" alt="Custom Bow Tie Suspender Bodysuit">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/csd-custom.jpg" alt="Custom Bow Tie Suspender Bodysuit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-rec">Välj egna färger</span>
               <div class="brand">Cuddle Sleep Dream</div>
@@ -1062,13 +1109,15 @@
                 <span class="card-price">~280 kr ($27)</span>
                 <span class="card-size">Newborn+</span>
               </div>
+            <a class="buy-btn" href="https://cuddlesleepdream.com/products/customize-it-bow-tie-suspender-bodysuit" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://cuddlesleepdream.com/products/baby-tux-outfit" target="_blank">
-            <img class="card-img" src="img/csd-tux.jpg" alt="Baby Tux Outfit">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/csd-tux.jpg" alt="Baby Tux Outfit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Cuddle Sleep Dream</div>
               <h3>Baby Tux Outfit</h3>
@@ -1077,13 +1126,15 @@
                 <span class="card-price">~280 kr ($27)</span>
                 <span class="card-size">Newborn+</span>
               </div>
+            <a class="buy-btn" href="https://cuddlesleepdream.com/products/baby-tux-outfit" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://cuddlesleepdream.com/products/monogrammed-tie-onesie" target="_blank">
-            <img class="card-img" src="img/csd-mono.jpg" alt="Monogrammed Tie Onesie">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/csd-mono.jpg" alt="Monogrammed Tie Onesie" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-custom">Med monogram</span>
               <div class="brand">Cuddle Sleep Dream</div>
@@ -1093,10 +1144,9 @@
                 <span class="card-price">~330 kr ($32)</span>
                 <span class="card-size">Newborn+</span>
               </div>
+            <a class="buy-btn" href="https://cuddlesleepdream.com/products/monogrammed-tie-onesie" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- H&M -->
@@ -1109,8 +1159,9 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://www2.hm.com/sv_se/productpage.0904894002.html" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8e0d0,#d4c9b5);font-family:'Playfair Display',serif;color:#2c3e50;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta + Väst<br>+ Byxor + Fluga<br><span style="font-size:0.75rem;color:#666;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Ljusbeige</span></div>
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8e0d0,#d4c9b5);font-family:'Playfair Display',serif;color:#2c3e50;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta + Väst<br>+ Byxor + Fluga<br><span style="font-size:0.75rem;color:#666;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Ljusbeige</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">H&M</div>
               <h3>3-delat set med fluga (Ljusbeige)</h3>
@@ -1119,13 +1170,12 @@
                 <span class="card-price">~249 kr</span>
                 <span class="card-size">Från 56</span>
               </div>
+            <a class="buy-btn" href="https://www2.hm.com/sv_se/productpage.0904894002.html" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www2.hm.com/sv_se/productpage.1203797001.html" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a2744,#2c3e50);font-family:'Playfair Display',serif;color:#e8e8e8;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta + Väst<br>+ Byxor + Fluga<br><span style="font-size:0.75rem;color:#aaa;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Marinblå/Vit</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a2744,#2c3e50);font-family:'Playfair Display',serif;color:#e8e8e8;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta + Väst<br>+ Byxor + Fluga<br><span style="font-size:0.75rem;color:#aaa;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Marinblå/Vit</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">H&M</div>
               <h3>3-delat dressat set med fluga (Marinblå)</h3>
@@ -1134,13 +1184,12 @@
                 <span class="card-price">~249 kr</span>
                 <span class="card-size">Från 56</span>
               </div>
+            <a class="buy-btn" href="https://www2.hm.com/sv_se/productpage.1203797001.html" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www2.hm.com/sv_se/productpage.0499979001.html" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f5f0e8,#fff);font-family:'Playfair Display',serif;color:#2c3e50;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta<br>+ Fluga<br><span style="font-size:0.75rem;color:#666;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Vit</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f5f0e8,#fff);font-family:'Playfair Display',serif;color:#2c3e50;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta<br>+ Fluga<br><span style="font-size:0.75rem;color:#666;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Vit</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">H&M</div>
               <h3>Skjorta med fluga (Vit)</h3>
@@ -1149,13 +1198,12 @@
                 <span class="card-price">~149 kr</span>
                 <span class="card-size">Från 56</span>
               </div>
+            <a class="buy-btn" href="https://www2.hm.com/sv_se/productpage.0499979001.html" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www2.hm.com/sv_se/productpage.0761960004.html" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a2744,#3d5174);font-family:'Playfair Display',serif;color:#e8e8e8;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta + Väst<br>+ Fluga<br><span style="font-size:0.75rem;color:#aaa;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Mörkblå/Vit</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a2744,#3d5174);font-family:'Playfair Display',serif;color:#e8e8e8;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta + Väst<br>+ Fluga<br><span style="font-size:0.75rem;color:#aaa;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Mörkblå/Vit</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">H&M</div>
               <h3>Skjorta med väst och fluga</h3>
@@ -1164,13 +1212,12 @@
                 <span class="card-price">~199 kr</span>
                 <span class="card-size">Från 56</span>
               </div>
+            <a class="buy-btn" href="https://www2.hm.com/sv_se/productpage.0761960004.html" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www2.hm.com/sv_se/productpage.1163040001.html" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f5f0e8,#ece4d4);font-family:'Playfair Display',serif;color:#2c3e50;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta<br>+ Fluga<br><span style="font-size:0.75rem;color:#666;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Cr&egrave;mevit</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f5f0e8,#ece4d4);font-family:'Playfair Display',serif;color:#2c3e50;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta<br>+ Fluga<br><span style="font-size:0.75rem;color:#666;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Cr&egrave;mevit</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">H&M</div>
               <h3>Skjorta och fluga (Cr&egrave;mevit)</h3>
@@ -1179,13 +1226,12 @@
                 <span class="card-price">~149 kr</span>
                 <span class="card-size">Från 56</span>
               </div>
+            <a class="buy-btn" href="https://www2.hm.com/sv_se/productpage.1163040001.html" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www2.hm.com/sv_se/productpage.1133812001.html" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#d4e5f7,#b8d4f0);font-family:'Playfair Display',serif;color:#2c3e50;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta<br>+ Fluga<br><span style="font-size:0.75rem;color:#556;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Ljusblå/Prickig</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#d4e5f7,#b8d4f0);font-family:'Playfair Display',serif;color:#2c3e50;font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Skjorta<br>+ Fluga<br><span style="font-size:0.75rem;color:#556;font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">Ljusblå/Prickig</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">H&M</div>
               <h3>Skjorta och fluga (Ljusblå/Prickig)</h3>
@@ -1194,10 +1240,9 @@
                 <span class="card-price">~149 kr</span>
                 <span class="card-size">Från 56</span>
               </div>
+            <a class="buy-btn" href="https://www2.hm.com/sv_se/productpage.1133812001.html" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- JACADI -->
@@ -1210,8 +1255,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://www.jacadi.ie/products/baby-boy-poplin-romper-2045942-j0913" target="_blank">
-            <img class="card-img" src="img/jacadi-poplin.jpg" alt="Jacadi Poplin Romper">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/jacadi-poplin.jpg" alt="Jacadi Poplin Romper" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Jacadi Paris</div>
               <h3>Poplin Romper (Fisk-print)</h3>
@@ -1220,13 +1269,15 @@
                 <span class="card-price">~550 kr (&euro;51)</span>
                 <span class="card-size">Från 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.jacadi.ie/products/baby-boy-poplin-romper-2045942-j0913" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.jacadi.us/toddler/Newborn/Bodysuits/Baby-boy-bodysuit-with-collar/p/2037629_701" target="_blank">
-            <img class="card-img" src="img/jacadi-collar.jpg" alt="Jacadi Bodysuit with Collar">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/jacadi-collar.jpg" alt="Jacadi Bodysuit with Collar" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Jacadi Paris</div>
               <h3>Body med handbroderad poplin-krage</h3>
@@ -1235,13 +1286,15 @@
                 <span class="card-price">~345 kr (&euro;32)</span>
                 <span class="card-size">Från 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.jacadi.us/toddler/Newborn/Bodysuits/Baby-boy-bodysuit-with-collar/p/2037629_701" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.jacadi.ie/collections/newborn-boy" target="_blank">
-            <img class="card-img" src="img/jacadi-linen.jpg" alt="Jacadi Linen Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/jacadi-linen.jpg" alt="Jacadi Linen Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Jacadi Paris</div>
               <h3>Baby Boy Linen Set</h3>
@@ -1250,13 +1303,15 @@
                 <span class="card-price">~850 kr (&euro;79)</span>
                 <span class="card-size">Från 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.jacadi.ie/collections/newborn-boy" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.jacadi.ie/collections/newborn-boy" target="_blank">
-            <img class="card-img" src="img/jacadi-garter.jpg" alt="Jacadi Garter Stitch Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/jacadi-garter.jpg" alt="Jacadi Garter Stitch Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Jacadi Paris</div>
               <h3>Baby Boy Set in Garter Stitch</h3>
@@ -1265,13 +1320,15 @@
                 <span class="card-price">~925 kr (&euro;86)</span>
                 <span class="card-size">Från 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.jacadi.ie/collections/newborn-boy" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.jacadi.ie/collections/newborn-boy" target="_blank">
-            <img class="card-img" src="img/jacadi-trousers.jpg" alt="Jacadi Trousers Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/jacadi-trousers.jpg" alt="Jacadi Trousers Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Jacadi Paris</div>
               <h3>Baby Boy Trousers Set</h3>
@@ -1280,13 +1337,15 @@
                 <span class="card-price">~635 kr (&euro;59)</span>
                 <span class="card-size">Från 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.jacadi.ie/collections/newborn-boy" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.jacadi.ie/collections/newborn-boy" target="_blank">
-            <img class="card-img" src="img/jacadi-jumpsuit.jpg" alt="Jacadi Jumpsuit Jersey">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/jacadi-jumpsuit.jpg" alt="Jacadi Jumpsuit Jersey" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Jacadi Paris</div>
               <h3>Baby Boy Jumpsuit in Jersey</h3>
@@ -1295,10 +1354,9 @@
                 <span class="card-price">~410 kr (&euro;38)</span>
                 <span class="card-size">Från 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.jacadi.ie/collections/newborn-boy" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- ACCESSOARER -->
@@ -1311,8 +1369,9 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://www.amazon.com/Born-Love-Scally-Newsboy-Driver/dp/B00LWH132E" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3d3124,#5c4a37);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1.2rem;text-align:center;padding:2rem;line-height:1.5;">Flat Cap<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;">Tweed, svart</span></div>
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3d3124,#5c4a37);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1.2rem;text-align:center;padding:2rem;line-height:1.5;">Flat Cap<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;">Tweed, svart</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">Born to Love</div>
               <h3>Flat Scally Cap (Tweed, Svart)</h3>
@@ -1321,13 +1380,12 @@
                 <span class="card-price">~150 kr</span>
                 <span class="card-size">NB (3-6M)</span>
               </div>
+            <a class="buy-btn" href="https://www.amazon.com/Born-Love-Scally-Newsboy-Driver/dp/B00LWH132E" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.amazon.com/Born-Love-Tweed-Newsboy-Driver/dp/B00PGDIX28" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#5c4a37,#8b7355);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1.2rem;text-align:center;padding:2rem;line-height:1.5;">Driver Cap<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;">Tweed, beige</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#5c4a37,#8b7355);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1.2rem;text-align:center;padding:2rem;line-height:1.5;">Driver Cap<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;">Tweed, beige</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">Born to Love</div>
               <h3>Tweed Page Driver Cap (Beige)</h3>
@@ -1336,13 +1394,12 @@
                 <span class="card-price">~150 kr</span>
                 <span class="card-size">NB (3-6M)</span>
               </div>
+            <a class="buy-btn" href="https://www.amazon.com/Born-Love-Tweed-Newsboy-Driver/dp/B00PGDIX28" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.amazon.com/Born-Love-Black-Herringbone-Newsboy/dp/B00L6RDVIE" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2a2a2a,#444);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1.2rem;text-align:center;padding:2rem;line-height:1.5;">Newsboy Cap<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;">Herringbone, svart/grå</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2a2a2a,#444);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1.2rem;text-align:center;padding:2rem;line-height:1.5;">Newsboy Cap<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;">Herringbone, svart/grå</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">Born to Love</div>
               <h3>Herringbone Newsboy Cap</h3>
@@ -1351,13 +1408,12 @@
                 <span class="card-price">~150 kr</span>
                 <span class="card-size">NB (3-6M)</span>
               </div>
+            <a class="buy-btn" href="https://www.amazon.com/Born-Love-Black-Herringbone-Newsboy/dp/B00L6RDVIE" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://fourtinycousins.com/products/gray-black-flat-cap-3-piece-newsboy-set" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3d3d3d,#555);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1rem;text-align:center;padding:1.5rem;line-height:1.5;">Keps + Hängslen<br>+ Shorts<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;">3-delat set</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/ftc-newsboy.jpg" alt="Newsboy 3-piece Set" loading="lazy"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Four Tiny Cousins</div>
               <h3>Newsboy 3-piece Set</h3>
@@ -1366,13 +1422,12 @@
                 <span class="card-price">~200 kr</span>
                 <span class="card-size">Newborn+</span>
               </div>
+            <a class="buy-btn" href="https://fourtinycousins.com/products/gray-black-flat-cap-3-piece-newsboy-set" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.etsy.com/market/newsboy_hat_baby_suspenders" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4a3728,#6b5240);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1rem;text-align:center;padding:1.5rem;line-height:1.5;">Handgjorda set<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;">Keps + hängslen + fluga</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4a3728,#6b5240);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1rem;text-align:center;padding:1.5rem;line-height:1.5;">Handgjorda set<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;">Keps + hängslen + fluga</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">Etsy (flera säljare)</div>
               <h3>Newsboy Hat + Suspenders Sets</h3>
@@ -1381,10 +1436,9 @@
                 <span class="card-price">Varierar</span>
                 <span class="card-size">Newborn+</span>
               </div>
+            <a class="buy-btn" href="https://www.etsy.com/market/newsboy_hat_baby_suspenders" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- SAILOR & NAUTICAL -->
@@ -1397,8 +1451,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://oneakids.com/products/sailor-knit-romper" target="_blank">
-            <img class="card-img" src="img/onea-sailor-1.jpg" alt="ONEA Sailor Romper">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/onea-sailor-1.jpg" alt="ONEA Sailor Romper" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-rec">5.0 stjärnor</span>
               <div class="brand">ONEA Kids</div>
@@ -1408,13 +1466,15 @@
                 <span class="card-price">~520 kr <span class="original">$90</span></span>
                 <span class="card-size">Från 3-6M</span>
               </div>
+            <a class="buy-btn" href="https://oneakids.com/products/sailor-knit-romper" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://oneakids.com/products/sailor-knit-romper" target="_blank">
-            <img class="card-img" src="img/onea-sailor-2.jpg" alt="ONEA Sailor Romper detail">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/onea-sailor-2.jpg" alt="ONEA Sailor Romper detail" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">ONEA Kids</div>
               <h3>Sailor Knit Romper (Detalj)</h3>
@@ -1423,13 +1483,15 @@
                 <span class="card-price">~520 kr</span>
                 <span class="card-size">Från 3-6M</span>
               </div>
+            <a class="buy-btn" href="https://oneakids.com/products/sailor-knit-romper" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.janieandjack.com/item/newborn-boy-the-gingham-sailor-baby-romper-100045502.html" target="_blank">
-            <img class="card-img" src="img/jj-sailor.jpg" alt="Janie and Jack Sailor Romper">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/jj-sailor.jpg" alt="Janie and Jack Sailor Romper" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-sale">75% Rea</span>
               <div class="brand">Janie and Jack</div>
@@ -1439,10 +1501,9 @@
                 <span class="card-price">~170 kr <span class="original">655 kr</span></span>
                 <span class="card-size">Från 0-3M</span>
               </div>
+            <a class="buy-btn" href="https://www.janieandjack.com/item/newborn-boy-the-gingham-sailor-baby-romper-100045502.html" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- KNIT SETS -->
@@ -1455,8 +1516,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">
-            <img class="card-img" src="img/feltman-pocket.png" alt="Feltman Pocket Knit Set">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/feltman-pocket.png" alt="Feltman Pocket Knit Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Feltman Brothers</div>
               <h3>Pocket Knit Set</h3>
@@ -1465,13 +1530,15 @@
                 <span class="card-price">~710 kr ($68)</span>
                 <span class="card-size">Newborn+</span>
               </div>
+            <a class="buy-btn" href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">
-            <img class="card-img" src="img/feltman-diamond.jpg" alt="Feltman Diamond Knit Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/feltman-diamond.jpg" alt="Feltman Diamond Knit Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Feltman Brothers</div>
               <h3>Piqu&eacute; Collar Diamond Knit 2-Piece</h3>
@@ -1480,13 +1547,15 @@
                 <span class="card-price">~680 kr ($65)</span>
                 <span class="card-size">Newborn+</span>
               </div>
+            <a class="buy-btn" href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">
-            <img class="card-img" src="img/feltman-occasion.jpg" alt="Feltman Special Occasion Knit">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/feltman-occasion.jpg" alt="Feltman Special Occasion Knit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Feltman Brothers</div>
               <h3>Special Occasion Knit 2-Piece</h3>
@@ -1495,13 +1564,15 @@
                 <span class="card-price">~815 kr ($78)</span>
                 <span class="card-size">Newborn+</span>
               </div>
+            <a class="buy-btn" href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">
-            <img class="card-img" src="img/feltman-cable.jpg" alt="Feltman Cable Knit Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/feltman-cable.jpg" alt="Feltman Cable Knit Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Feltman Brothers</div>
               <h3>Cable Knit Two Piece with Hat</h3>
@@ -1510,10 +1581,9 @@
                 <span class="card-price">~700 kr ($67)</span>
                 <span class="card-size">Newborn+</span>
               </div>
+            <a class="buy-btn" href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- DRESSY ROMPERS -->
@@ -1526,8 +1596,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://kaiterfly.com/products/dressy-waistcoat-style-1-piece-romper-for-infant-boys-green" target="_blank">
-            <img class="card-img" src="img/kaiterfly-vest.png" alt="KaiterFly Waistcoat Romper">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/kaiterfly-vest.png" alt="KaiterFly Waistcoat Romper" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">KaiterFly</div>
               <h3>Dressy Waistcoat Romper (Grön)</h3>
@@ -1536,13 +1610,12 @@
                 <span class="card-price">~260 kr <span class="original">$28</span></span>
                 <span class="card-size">Från 0-3M</span>
               </div>
+            <a class="buy-btn" href="https://kaiterfly.com/products/dressy-waistcoat-style-1-piece-romper-for-infant-boys-green" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.amazon.com/Fairy-Baby-Gentleman-Jumpsuit-Clothes/dp/B09724VHWP" target="_blank">
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#5c4a37,#3d2e1f);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Väst + Fluga<br>+ Byxor<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">3-delat, Brun</span></div>
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#5c4a37,#3d2e1f);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Väst + Fluga<br>+ Byxor<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">3-delat, Brun</span></div></div>
+          </div>
             <div class="card-body">
               <div class="brand">Amazon</div>
               <h3>Gentleman Waistcoat Tuxedo Onesie</h3>
@@ -1551,10 +1624,9 @@
                 <span class="card-price">~200 kr</span>
                 <span class="card-size">Från 3-6M</span>
               </div>
+            <a class="buy-btn" href="https://www.amazon.com/Fairy-Baby-Gentleman-Jumpsuit-Clothes/dp/B09724VHWP" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- CHILDRENSALON: FORMAL & CEREMONY -->
@@ -1568,8 +1640,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/emile-et-rose" target="_blank">
-            <img class="card-img" src="img/cs-emile-buster.jpg" alt="Emile et Rose Buster Suit">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-emile-buster.jpg" alt="Emile et Rose Buster Suit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-rec">Rekommenderas</span>
               <div class="brand">Emile et Rose</div>
@@ -1579,13 +1655,15 @@
                 <span class="card-price">~650 kr</span>
                 <span class="card-size">Fr&aring;n 1M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/emile-et-rose" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/emile-et-rose" target="_blank">
-            <img class="card-img" src="img/cs-emile-waistcoat.jpg" alt="Emile et Rose Waistcoat Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-emile-waistcoat.jpg" alt="Emile et Rose Waistcoat Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Emile et Rose</div>
               <h3>Waistcoat &amp; Shorts Set</h3>
@@ -1594,13 +1672,15 @@
                 <span class="card-price">~700 kr</span>
                 <span class="card-size">Fr&aring;n 1M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/emile-et-rose" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/beau-kid" target="_blank">
-            <img class="card-img" src="img/cs-beau-buster.jpg" alt="Beau KiD Buster Suit">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-beau-buster.jpg" alt="Beau KiD Buster Suit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Beau KiD</div>
               <h3>Ivory Buster Suit</h3>
@@ -1609,13 +1689,15 @@
                 <span class="card-price">~550 kr</span>
                 <span class="card-size">Fr&aring;n 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/beau-kid" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/romano" target="_blank">
-            <img class="card-img" src="img/cs-romano-satin.jpg" alt="Romano Satin Waistcoat Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-romano-satin.jpg" alt="Romano Satin Waistcoat Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Romano</div>
               <h3>Satin Waistcoat Set</h3>
@@ -1624,13 +1706,15 @@
                 <span class="card-price">~900 kr</span>
                 <span class="card-size">Fr&aring;n 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/romano" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/patachou" target="_blank">
-            <img class="card-img" src="img/cs-patachou-romper.jpg" alt="Patachou Ceremony Romper">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-patachou-romper.jpg" alt="Patachou Ceremony Romper" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-rec">Ceremoni</span>
               <div class="brand">Patachou</div>
@@ -1640,13 +1724,15 @@
                 <span class="card-price">~750 kr</span>
                 <span class="card-size">Fr&aring;n 1M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/patachou" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/patachou" target="_blank">
-            <img class="card-img" src="img/cs-patachou-dungaree.jpg" alt="Patachou Dungaree Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-patachou-dungaree.jpg" alt="Patachou Dungaree Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Patachou</div>
               <h3>Dungaree &amp; Shirt Set</h3>
@@ -1655,13 +1741,15 @@
                 <span class="card-price">~680 kr</span>
                 <span class="card-size">Fr&aring;n 1M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/patachou" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/paz-rodriguez" target="_blank">
-            <img class="card-img" src="img/cs-paz-ivory.jpg" alt="PAZ Rodriguez Ivory Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-paz-ivory.jpg" alt="PAZ Rodriguez Ivory Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">PAZ Rodr&iacute;guez</div>
               <h3>Ivory Knit Set</h3>
@@ -1670,13 +1758,15 @@
                 <span class="card-price">~850 kr</span>
                 <span class="card-size">Fr&aring;n 1M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/paz-rodriguez" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/sofija" target="_blank">
-            <img class="card-img" src="img/cs-sofija-velour.jpg" alt="Sofija Velour Romper">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-sofija-velour.jpg" alt="Sofija Velour Romper" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Sofija</div>
               <h3>Velour Romper</h3>
@@ -1685,13 +1775,15 @@
                 <span class="card-price">~450 kr</span>
                 <span class="card-size">Fr&aring;n NB</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/sofija" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/ancar" target="_blank">
-            <img class="card-img" src="img/cs-ancar-linen.jpg" alt="Ancar Linen Set">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-ancar-linen.jpg" alt="Ancar Linen Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Ancar</div>
               <h3>Linen Shirt &amp; Shorts</h3>
@@ -1700,10 +1792,9 @@
                 <span class="card-price">~600 kr</span>
                 <span class="card-size">Fr&aring;n 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/ancar" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- CHILDRENSALON: BLAZERS & HÄNGSLEN -->
@@ -1716,8 +1807,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/mayoral" target="_blank">
-            <img class="card-img" src="img/cs-mayoral-blazer.jpg" alt="Mayoral Baby Blazer">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-mayoral-blazer.jpg" alt="Mayoral Baby Blazer" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-rec">Rekommenderas</span>
               <div class="brand">Mayoral</div>
@@ -1727,13 +1822,15 @@
                 <span class="card-price">~500 kr</span>
                 <span class="card-size">Fr&aring;n 2-4M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/mayoral" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/mayoral" target="_blank">
-            <img class="card-img" src="img/cs-mayoral-braces-beige.jpg" alt="Mayoral Braces Set Beige">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-mayoral-braces-beige.jpg" alt="Mayoral Braces Set Beige" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Mayoral</div>
               <h3>Braces &amp; Trousers Set (Beige)</h3>
@@ -1742,13 +1839,15 @@
                 <span class="card-price">~400 kr</span>
                 <span class="card-size">Fr&aring;n 2-4M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/mayoral" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/mayoral" target="_blank">
-            <img class="card-img" src="img/cs-mayoral-braces-blue.jpg" alt="Mayoral Braces Set Blue">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-mayoral-braces-blue.jpg" alt="Mayoral Braces Set Blue" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Mayoral</div>
               <h3>Braces &amp; Trousers Set (Bl&aring;)</h3>
@@ -1757,13 +1856,15 @@
                 <span class="card-price">~400 kr</span>
                 <span class="card-size">Fr&aring;n 2-4M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/mayoral" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/ralph-lauren" target="_blank">
-            <img class="card-img" src="img/cs-rl-polo.jpg" alt="Ralph Lauren Baby Polo">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-rl-polo.jpg" alt="Ralph Lauren Baby Polo" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-rec">Ikoniskt</span>
               <div class="brand">Ralph Lauren</div>
@@ -1773,10 +1874,9 @@
                 <span class="card-price">~550 kr</span>
                 <span class="card-size">Fr&aring;n 3M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/ralph-lauren" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-      </div>
+        </div></div>
     </div>
 
     <!-- CHILDRENSALON: ACCESSOARER & SKOR -->
@@ -1789,8 +1889,12 @@
 
       <div class="grid">
         <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/guess" target="_blank">
-            <img class="card-img" src="img/cs-guess-bowtie.jpg" alt="Guess Bow Tie Set">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-guess-bowtie.jpg" alt="Guess Bow Tie Set" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Guess</div>
               <h3>Bow Tie &amp; Pocket Square Set</h3>
@@ -1799,13 +1903,15 @@
                 <span class="card-price">~300 kr</span>
                 <span class="card-size">One size</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/guess" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/ralph-lauren" target="_blank">
-            <img class="card-img" src="img/cs-rl-cap.jpg" alt="Ralph Lauren Baby Cap">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-rl-cap.jpg" alt="Ralph Lauren Baby Cap" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Ralph Lauren</div>
               <h3>Cotton Baseball Cap</h3>
@@ -1814,13 +1920,15 @@
                 <span class="card-price">~350 kr</span>
                 <span class="card-size">Fr&aring;n 3-9M</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/ralph-lauren" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/petit-bateau" target="_blank">
-            <img class="card-img" src="img/cs-pb-cap.jpg" alt="Petit Bateau Baby Cap">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-pb-cap.jpg" alt="Petit Bateau Baby Cap" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Petit Bateau</div>
               <h3>Organic Cotton Cap</h3>
@@ -1829,13 +1937,15 @@
                 <span class="card-price">~250 kr</span>
                 <span class="card-size">Fr&aring;n NB</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/petit-bateau" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/pre-walker-brogue" target="_blank">
-            <img class="card-img" src="img/cs-brogue.jpg" alt="Baby Brogue Shoes">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-brogue.jpg" alt="Baby Brogue Shoes" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <span class="card-tag tag-rec">Gentleman-sko</span>
               <div class="brand">Childrensalon</div>
@@ -1845,13 +1955,15 @@
                 <span class="card-price">~400 kr</span>
                 <span class="card-size">Fr&aring;n NB</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/pre-walker-brogue" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/pre-walker-patent" target="_blank">
-            <img class="card-img" src="img/cs-patent.jpg" alt="Patent Leather Baby Shoes">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-patent.jpg" alt="Patent Leather Baby Shoes" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Childrensalon</div>
               <h3>Patent Leather Shoes</h3>
@@ -1860,13 +1972,15 @@
                 <span class="card-price">~350 kr</span>
                 <span class="card-size">Fr&aring;n NB</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/pre-walker-patent" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
-        </div>
-
-        <div class="card">
-          <a href="https://www.childrensalon.com/catalogue/product/ceremony-shoes" target="_blank">
-            <img class="card-img" src="img/cs-ceremony-shoes.jpg" alt="Ceremony Baby Shoes">
+        </div><div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-ceremony-shoes.jpg" alt="Ceremony Baby Shoes" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
             <div class="card-body">
               <div class="brand">Childrensalon</div>
               <h3>Ceremony Shoes</h3>
@@ -1875,8 +1989,133 @@
                 <span class="card-price">~380 kr</span>
                 <span class="card-size">Fr&aring;n NB</span>
               </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/catalogue/product/ceremony-shoes" target="_blank">K&ouml;p &rarr;</a>
             </div>
-          </a>
+        </div></div>
+    </div>
+
+    <!-- LILAX TUXEDO FOOTIES -->
+    <div class="section" id="lilax">
+      <div class="section-header">
+        <h2>Lilax: Tuxedo Footies</h2>
+        <span class="badge">USA</span>
+        <span class="badge">Fr&aring;n Newborn</span>
+      </div>
+      <p class="section-desc">Helkropps-tuxedo med fot. Ser ut som kostym men k&auml;nns som pyjamas. 100% bomull, tryckknappar. Finns i 8 f&auml;rger.</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-carousel" data-images="img/lilax-tux-black.webp,img/lilax-tux-beige.webp,img/lilax-tux-navy.webp,img/lilax-tux-grey.webp">
+            <div class="slides">
+              <img class="card-img" src="img/lilax-tux-black.webp" alt="Lilax Tuxedo Footie Black" loading="lazy">
+              <img class="card-img" src="img/lilax-tux-beige.webp" alt="Lilax Tuxedo Footie Beige" loading="lazy">
+              <img class="card-img" src="img/lilax-tux-navy.webp" alt="Lilax Tuxedo Footie Navy" loading="lazy">
+              <img class="card-img" src="img/lilax-tux-grey.webp" alt="Lilax Tuxedo Footie Grey" loading="lazy">
+            </div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
+          <div class="card-body">
+            <span class="card-tag tag-rec">Rekommenderas</span>
+            <div class="brand">Lilax</div>
+            <h3>Gentleman Tuxedo Footie</h3>
+            <p class="desc">Helkropps-romper med kavaj-tryck, fluga och fot. Ser ut som tr&auml;delat men &auml;r ett plagg. 8 f&auml;rgval. Swipa f&ouml;r fler.</p>
+            <div class="card-meta">
+              <span class="card-price">~365 kr ($35)</span>
+              <span class="card-size">Fr&aring;n NB</span>
+            </div>
+            <a class="buy-btn" href="https://www.lilaxshop.com/products/baby-boy-gentleman-tuxedo-footie-christmas-holiday-outfit-with-bow-tie" target="_blank">K&ouml;p &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHILDRENSALON: BUSTER SUITS (nya) -->
+    <div class="section" id="cs-buster">
+      <div class="section-header">
+        <h2>Childrensalon: Buster Suits</h2>
+        <span class="badge">Ceremoni</span>
+        <span class="badge">Europeiskt</span>
+      </div>
+      <p class="section-desc">Klassiska europeiska buster suits med shorts, skjorta och v&auml;st i ett. Perfekt f&ouml;r dop, namngivning och finare tillst&auml;llningar.</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-kidiwi-pintuck.jpg" alt="Kidiwi Pin Tuck Buster Suit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
+          <div class="card-body">
+            <span class="card-tag tag-rec">Nytt</span>
+            <div class="brand">Kidiwi</div>
+            <h3>White &amp; Yellow Pin Tuck Buster Suit</h3>
+            <p class="desc">Franskt m&auml;rke. Vit med gula pin tuck-detaljer. Handgjord kvalitetsk&auml;nsla.</p>
+            <div class="card-meta">
+              <span class="card-price">~1 030 kr (&pound;78)</span>
+              <span class="card-size">Fr&aring;n 3M</span>
+            </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/beau-kid-baby-boys-ivory-beige-cotton-buster-suit-593139.html" target="_blank">K&ouml;p &rarr;</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-bg-linen.jpg" alt="Beatrice George Linen Buster Suit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
+          <div class="card-body">
+            <div class="brand">Beatrice &amp; George</div>
+            <h3>White Linen &amp; Cotton Buster Suit</h3>
+            <p class="desc">Brittiskt m&auml;rke. Linne och bomull, somrig ceremoni-look. Tidl&ouml;s elegans.</p>
+            <div class="card-meta">
+              <span class="card-price">~1 190 kr (&pound;90)</span>
+              <span class="card-size">Fr&aring;n 3M</span>
+            </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/baby/outfit-sets/buster-suits" target="_blank">K&ouml;p &rarr;</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-paz-emb.jpg" alt="PAZ Rodriguez Embroidered Buster Suit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
+          <div class="card-body">
+            <div class="brand">PAZ Rodr&iacute;guez</div>
+            <h3>Ivory Embroidered Buster Suit</h3>
+            <p class="desc">Spanskt hantverk. Broderade detaljer p&aring; ivory-bomull. Dopkvalitet.</p>
+            <div class="card-meta">
+              <span class="card-price">~1 190 kr (&pound;90)</span>
+              <span class="card-size">Fr&aring;n 3M</span>
+            </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/baby/outfit-sets/buster-suits" target="_blank">K&ouml;p &rarr;</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-carousel single">
+            <div class="slides"><img class="card-img" src="img/cs-ancar-navy.jpg" alt="Ancar Navy Buster Suit" loading="lazy"></div>
+            <button class="arrow arrow-left">&#8249;</button>
+            <button class="arrow arrow-right">&#8250;</button>
+            <div class="card-dots"></div>
+          </div>
+          <div class="card-body">
+            <div class="brand">Ancar</div>
+            <h3>Navy Blue &amp; White Buster Suit</h3>
+            <p class="desc">Spansk bomull. Marinbl&aring;/vit, klassisk kombination. Budget-lyx.</p>
+            <div class="card-meta">
+              <span class="card-price">~715 kr (&pound;54)</span>
+              <span class="card-size">Fr&aring;n 3M</span>
+            </div>
+            <a class="buy-btn" href="https://www.childrensalon.com/baby/outfit-sets/buster-suits" target="_blank">K&ouml;p &rarr;</a>
+          </div>
         </div>
       </div>
     </div>
@@ -1885,7 +2124,7 @@
     <button class="back-top" id="backTop" onclick="window.scrollTo({top:0})">&#8593;</button>
 
     <footer>
-      Vilgots Garderob &middot; Gentleman Collection &middot; 55+ plagg &middot; Kuraterat mars 2026
+      Vilgots Garderob &middot; Gentleman Collection &middot; 65+ plagg &middot; Kuraterat mars 2026
     </footer>
   </div>
 
@@ -1990,43 +2229,54 @@
       return { burst, rain };
     })();
 
-    // ===== PASSWORD CHECK =====
-    const HASH = '2eb0e37fad33ebc118aae2ba8b4d7bc4a7d890c8cf0a63fdf62f885af9a762d2';
+    // ===== WELCOME CONFETTI =====
+    setTimeout(() => {
+      const cx = window.innerWidth / 2;
+      Confetti.burst(cx, 120, 50);
+      Confetti.rain(30);
+    }, 400);
 
-    async function sha256(str) {
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
+    // ===== IMAGE CAROUSEL =====
+    document.querySelectorAll('.card-carousel').forEach(carousel => {
+      const slides = carousel.querySelector('.slides');
+      const images = slides.querySelectorAll('img');
+      const arrowL = carousel.querySelector('.arrow-left');
+      const arrowR = carousel.querySelector('.arrow-right');
+      const dotsEl = carousel.querySelector('.card-dots');
+      if (!images.length || images.length <= 1) return;
 
-    async function checkPass() {
-      const pw = document.getElementById('pw').value;
-      const hash = await sha256(pw);
-      if (hash === HASH) {
-        // Konfetti-explosion vid login!
-        const cx = window.innerWidth / 2;
-        const cy = window.innerHeight / 2;
-        Confetti.burst(cx, cy - 50, 80);
-        setTimeout(() => Confetti.burst(cx - 100, cy, 40), 150);
-        setTimeout(() => Confetti.burst(cx + 100, cy, 40), 300);
-        Confetti.rain(60);
+      carousel.classList.remove('single');
+      let current = 0;
 
-        setTimeout(() => {
-          document.getElementById('gate').classList.add('hidden');
-          document.getElementById('content').classList.add('visible');
-        }, 600);
-        sessionStorage.setItem('vg_auth', '1');
-      } else {
-        document.getElementById('err').classList.add('show');
-        setTimeout(() => document.getElementById('err').classList.remove('show'), 2000);
+      // Build dots
+      images.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', (e) => { e.stopPropagation(); goTo(i); });
+        dotsEl.appendChild(dot);
+      });
+
+      function goTo(idx) {
+        current = Math.max(0, Math.min(idx, images.length - 1));
+        slides.style.transform = `translateX(-${current * 100}%)`;
+        dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
       }
-      return false;
-    }
 
-    // Auto-unlock if already authenticated in session
-    if (sessionStorage.getItem('vg_auth')) {
-      document.getElementById('gate').classList.add('hidden');
-      document.getElementById('content').classList.add('visible');
-    }
+      arrowL.addEventListener('click', (e) => { e.stopPropagation(); goTo(current - 1); });
+      arrowR.addEventListener('click', (e) => { e.stopPropagation(); goTo(current + 1); });
+
+      // Touch swipe
+      let startX = 0, startY = 0, diffX = 0;
+      carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }, { passive: true });
+      carousel.addEventListener('touchmove', e => { diffX = e.touches[0].clientX - startX; }, { passive: true });
+      carousel.addEventListener('touchend', () => {
+        if (Math.abs(diffX) > 40) {
+          if (diffX < 0) goTo(current + 1);
+          else goTo(current - 1);
+        }
+        diffX = 0;
+      });
+    });
 
     // ===== THEME TOGGLE =====
     const toggle = document.getElementById('themeToggle');
