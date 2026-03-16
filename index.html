@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vilgots Garderob</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0f0f0f;
+      --card: #1a1a1a;
+      --card-hover: #222;
+      --accent: #c9a96e;
+      --accent-light: #e4d5b7;
+      --text: #e8e8e8;
+      --text-muted: #888;
+      --border: #2a2a2a;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Password Gate */
+    #gate {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+
+    #gate.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .gate-box {
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .gate-box h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .gate-box p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .gate-box input {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      width: 240px;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .gate-box input:focus {
+      border-color: var(--accent);
+    }
+
+    .gate-box input::placeholder {
+      color: #555;
+    }
+
+    .gate-error {
+      color: #e74c3c;
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .gate-error.show { opacity: 1; }
+
+    /* Main Content */
+    #content {
+      display: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    #content.visible { display: block; }
+
+    /* Header */
+    header {
+      text-align: center;
+      padding: 4rem 0 3rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 400;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    header .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    header .note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 1.5rem;
+      font-style: italic;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: var(--accent-light);
+    }
+
+    .section-header .badge {
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .section-header .badge.sale { background: #e74c3c; color: #fff; }
+    .section-header .badge.custom { background: #8e44ad; color: #fff; }
+    .section-header .badge.au { background: #2ecc71; color: #fff; }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      max-width: 700px;
+    }
+
+    /* Product Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid var(--border);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      border-color: var(--accent);
+    }
+
+    .card a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+      background: #111;
+    }
+
+    .card-body {
+      padding: 1.2rem;
+    }
+
+    .card-body h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 400;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    .card-body .brand {
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-body .desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-price {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .card-price .original {
+      text-decoration: line-through;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 400;
+      margin-left: 0.4rem;
+    }
+
+    .card-size {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.05);
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+    }
+
+    .card-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .tag-rec { background: var(--accent); color: var(--bg); }
+    .tag-sale { background: #e74c3c; color: #fff; }
+    .tag-custom { background: #8e44ad; color: #fff; }
+    .tag-sold { background: #555; color: #ccc; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 3rem 0;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    /* Size note */
+    .size-note {
+      background: linear-gradient(135deg, rgba(201,169,110,0.1), rgba(201,169,110,0.05));
+      border: 1px solid rgba(201,169,110,0.2);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .size-note h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .size-note p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 2.2rem; }
+      .grid { grid-template-columns: 1fr; }
+      .gate-box h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Password Gate -->
+  <div id="gate">
+    <div class="gate-box">
+      <h1>Vilgots Garderob</h1>
+      <p>En privat lookbook</p>
+      <form onsubmit="return checkPass()">
+        <input type="password" id="pw" placeholder="Kod" autofocus>
+      </form>
+      <div class="gate-error" id="err">Fel kod</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="content">
+    <header>
+      <h1>Vilgots Garderob</h1>
+      <div class="subtitle">Gentleman Collection</div>
+      <div class="note">Kostym, smoking, fluga &amp; hängslen i miniformat. Vardagsplagg med vuxen-vibe.</div>
+    </header>
+
+    <!-- Size Note -->
+    <div class="size-note">
+      <h3>Om storlekar</h3>
+      <p>Vilgot är i storlek ~44-50 (prematur). De flesta gentleman-kläder börjar på 56 eller 62. Han beräknas vara på sjukhuset 4-6 veckor och växer in i 62 under den tiden. Custom-plagg från Bee Rose/Etsy kan beställas i prematurstorlek direkt.</p>
+    </div>
+
+    <!-- THE TINY UNIVERSE -->
+    <div class="section">
+      <div class="section-header">
+        <h2>The Tiny Universe</h2>
+        <span class="badge">Svenskt</span>
+        <span class="badge">Toppval</span>
+      </div>
+      <p class="section-desc">Stockholmsbaserat märke, grundat 2010. "Världens första onesie-kostym." Ekologisk bomull, flock-print, YKK-knappar. Tvätt 40&deg;. Alla modeller finns i 62, 68, 74, 80, 92.</p>
+
+      <div class="grid">
+        <div class="card">
+          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
+            <img class="card-img" src="https://thetinyuniverse.com/cdn/shop/products/the-tiny-tuxedo-classicsuitstuxedos0-3-m-62-513324.jpg?v=1735652912&width=600" alt="The Tiny Tuxedo Classic">
+            <div class="card-body">
+              <span class="card-tag tag-rec">Rekommenderas</span>
+              <div class="brand">The Tiny Universe</div>
+              <h3>The Tiny Tuxedo Classic</h3>
+              <p class="desc">Klassisk smoking-body med flock-print. Ikoniska modellen som startade allt.</p>
+              <div class="card-meta">
+                <span class="card-price">490 kr</span>
+                <span class="card-size">Från 62</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
+            <img class="card-img" src="https://thetinyuniverse.com/cdn/shop/products/the-tiny-tuxedosuitstuxedoswhite-435129.jpg?v=1735652909&width=600" alt="The Tiny Tuxedo White">
+            <div class="card-body">
+              <div class="brand">The Tiny Universe</div>
+              <h3>The Tiny Tuxedo White</h3>
+              <p class="desc">Vit smoking-body. Somrigt och stilrent.</p>
+              <div class="card-meta">
+                <span class="card-price">490 kr</span>
+                <span class="card-size">Från 62</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
+            <img class="card-img" src="https://thetinyuniverse.com/cdn/shop/products/the-tiny-tuxedosuitstuxedosblack-442998.jpg?v=1735652911&width=600" alt="The Tiny Tuxedo Black">
+            <div class="card-body">
+              <div class="brand">The Tiny Universe</div>
+              <h3>The Tiny Tuxedo Black</h3>
+              <p class="desc">Helsvart smoking-body. Maximal elegans.</p>
+              <div class="card-meta">
+                <span class="card-price">490 kr</span>
+                <span class="card-size">Från 62</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://thetinyuniverse.com/products/the-casual-suit" target="_blank">
+            <img class="card-img" src="https://thetinyuniverse.com/cdn/shop/products/the-casual-suitsuitstuxedos3-m-62-371959.jpg?v=1735652914&width=600" alt="The Casual Suit">
+            <div class="card-body">
+              <div class="brand">The Tiny Universe</div>
+              <h3>The Casual Suit</h3>
+              <p class="desc">Kostym-body med kavaj-tryck. Vardags-business.</p>
+              <div class="card-meta">
+                <span class="card-price">420 kr</span>
+                <span class="card-size">Från 62</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
+            <img class="card-img" src="https://thetinyuniverse.com/cdn/shop/products/the-tiny-tuxedo-red-bow-tie0-3-m-62-200521.jpg?v=1735652898&width=600" alt="The Tiny Tuxedo Red Bow-Tie">
+            <div class="card-body">
+              <div class="brand">The Tiny Universe</div>
+              <h3>The Tiny Tuxedo Red Bow-Tie</h3>
+              <p class="desc">Smoking-body med röd fluga. Extra festlig.</p>
+              <div class="card-meta">
+                <span class="card-price">420 kr</span>
+                <span class="card-size">Från 62</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
+            <img class="card-img" src="https://thetinyuniverse.com/cdn/shop/products/the-tiny-body-tuxedosuitstuxedosblack-white-932844.jpg?v=1735652959&width=600" alt="The Tiny Body Tuxedo B&W">
+            <div class="card-body">
+              <span class="card-tag tag-sale">Rea</span>
+              <div class="brand">The Tiny Universe</div>
+              <h3>The Tiny Body Tuxedo</h3>
+              <p class="desc">Smoking-body i svart/vitt. Tre färgval. Bästa pris/kvalitet-förhållande.</p>
+              <div class="card-meta">
+                <span class="card-price">190 kr <span class="original">380 kr</span></span>
+                <span class="card-size">Från 62</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
+            <img class="card-img" src="https://thetinyuniverse.com/cdn/shop/products/the-tiny-body-tuxedosuitstuxedoswhite-917173.jpg?v=1735652960&width=600" alt="The Tiny Body Tuxedo White">
+            <div class="card-body">
+              <span class="card-tag tag-sale">Rea</span>
+              <div class="brand">The Tiny Universe</div>
+              <h3>The Tiny Body Tuxedo White</h3>
+              <p class="desc">Vit variant av smoking-bodyn.</p>
+              <div class="card-meta">
+                <span class="card-price">190 kr <span class="original">380 kr</span></span>
+                <span class="card-size">Från 62</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://thetinyuniverse.com/collections/suits-tuxedos" target="_blank">
+            <img class="card-img" src="https://thetinyuniverse.com/cdn/shop/products/the-tiny-body-tuxedosuitstuxedosblack-450127.jpg?v=1735652960&width=600" alt="The Tiny Body Tuxedo Black">
+            <div class="card-body">
+              <span class="card-tag tag-sale">Rea</span>
+              <div class="brand">The Tiny Universe</div>
+              <h3>The Tiny Body Tuxedo Black</h3>
+              <p class="desc">Helsvart variant av smoking-bodyn.</p>
+              <div class="card-meta">
+                <span class="card-price">190 kr <span class="original">380 kr</span></span>
+                <span class="card-size">Från 62</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- LULU BABE -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Lulu Babe</h2>
+        <span class="badge au">Australien</span>
+      </div>
+      <p class="section-desc">Australiensiskt märke. Skjortbodys med hängslen, shorts och flugor. Finns från 0-3M. Fraktkostnad tillkommer.</p>
+
+      <div class="grid">
+        <div class="card">
+          <a href="https://lulubabe.com/products/henry-bow-tie-suspenders-set" target="_blank">
+            <img class="card-img" src="https://lulubabe.com/cdn/shop/files/baby-boy-formal-outfit-green-bow-tie-suspenders.jpg?v=1761062816&width=600" alt="Henry Bow Tie Set Green">
+            <div class="card-body">
+              <span class="card-tag tag-rec">Rekommenderas</span>
+              <div class="brand">Lulu Babe</div>
+              <h3>Henry Bow Tie & Suspenders Set</h3>
+              <p class="desc">Vit skjortbody + shorts med hängslen + fluga. 3 färger: grön, blå, rosa.</p>
+              <div class="card-meta">
+                <span class="card-price">~280 kr <span class="original">AUD 39.95</span></span>
+                <span class="card-size">Från 0-3M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://lulubabe.com/products/henry-bow-tie-suspenders-set" target="_blank">
+            <img class="card-img" src="https://lulubabe.com/cdn/shop/files/baby-boy-formal-outfit-bow-tie-blue.jpg?v=1768419642&width=600" alt="Henry Bow Tie Set Blue">
+            <div class="card-body">
+              <div class="brand">Lulu Babe</div>
+              <h3>Henry Set (Blue)</h3>
+              <p class="desc">Blå variant. Samma snitt och kvalitet.</p>
+              <div class="card-meta">
+                <span class="card-price">~280 kr</span>
+                <span class="card-size">Från 0-3M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://lulubabe.com/products/levi-tie-suspenders-set" target="_blank">
+            <img class="card-img" src="https://lulubabe.com/cdn/shop/products/levi-tie-suspender-set.jpg?v=1709304535&width=600" alt="Levi Tie & Suspenders Set">
+            <div class="card-body">
+              <div class="brand">Lulu Babe</div>
+              <h3>Levi Tie & Suspenders Set</h3>
+              <p class="desc">Kritstrecksrandig romper med polka dot-fluga och hängseshorts.</p>
+              <div class="card-meta">
+                <span class="card-price">~240 kr</span>
+                <span class="card-size">Från 0-6M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://lulubabe.com/products/tuxedo-shorts-set" target="_blank">
+            <img class="card-img" src="https://lulubabe.com/cdn/shop/files/baby-boy-tuxedo-shorts-formal-outfit.jpg?v=1745833154&width=600" alt="Tuxedo Shorts Set">
+            <div class="card-body">
+              <div class="brand">Lulu Babe</div>
+              <h3>Tuxedo Shorts Set</h3>
+              <p class="desc">Romper med mustasch/glasögon-print + svarta hängseshorts + fluga. Lekfull twist.</p>
+              <div class="card-meta">
+                <span class="card-price">~240 kr <span class="original">AUD 33.95</span></span>
+                <span class="card-size">Från 0-6M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOM -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Custom & Handgjort</h2>
+        <span class="badge custom">Prematurstorlek</span>
+      </div>
+      <p class="section-desc">Handgjorda plagg som kan beställas i prematurstorlek. Perfekt om du vill ha något NU medan Vilgot är i storlek 44-50.</p>
+
+      <div class="grid">
+        <div class="card">
+          <a href="https://beeroseboutique.com/products/custom-bow-tie-onesie" target="_blank">
+            <img class="card-img" src="https://beeroseboutique.com/cdn/shop/files/A99D227B-3C68-473C-B518-B5D1BF9707B6.png?v=1754205729&width=600" alt="Custom Bow Tie Onesie">
+            <div class="card-body">
+              <span class="card-tag tag-custom">Custom med namn</span>
+              <div class="brand">Bee Rose Boutique</div>
+              <h3>Custom Knit Bow Tie Onesie</h3>
+              <p class="desc">Stickad body med fluga. Vilgots namn broderat i tyget. 16 färgval. Prematurstorlek tillgänglig.</p>
+              <div class="card-meta">
+                <span class="card-price">~470 kr ($47)</span>
+                <span class="card-size">Prematur-24M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://beeroseboutique.com/products/custom-bow-tie-onesie" target="_blank">
+            <img class="card-img" src="https://beeroseboutique.com/cdn/shop/products/image_6f0165eb-aca9-48e0-82a5-3447e632b65e.jpg?v=1754205729&width=600" alt="Custom Bow Tie Onesie detail">
+            <div class="card-body">
+              <span class="card-tag tag-custom">Custom med namn</span>
+              <div class="brand">Bee Rose Boutique</div>
+              <h3>Custom Knit Bow Tie (Detalj)</h3>
+              <p class="desc">Närbild. Flugan och namnet stickade direkt i tyget. Kvalitetskänsla.</p>
+              <div class="card-meta">
+                <span class="card-price">~470 kr ($47)</span>
+                <span class="card-size">Prematur-24M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://www.etsy.com/market/preemie_tuxedo" target="_blank">
+            <img class="card-img" src="https://beeroseboutique.com/cdn/shop/products/087338D4-39C3-4F0D-9503-193B83AD2D8E_28b2f9b0-c7cc-44e8-bd23-ac65368fdf67.jpeg?v=1754205729&width=600" alt="Etsy Preemie Tuxedo">
+            <div class="card-body">
+              <div class="brand">Etsy (flera säljare)</div>
+              <h3>Preemie Tuxedo Rompers</h3>
+              <p class="desc">Handgjorda smoking-rompers i prematurstorlekar. Unika plagg, varierat utbud.</p>
+              <div class="card-meta">
+                <span class="card-price">Varierar</span>
+                <span class="card-size">Preemie+</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTHER -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Fler alternativ</h2>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <a href="https://cuddlesleepdream.com/collections/baby-boy-tie-suspender-onesies" target="_blank">
+            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e,#16213e);font-family:'Playfair Display',serif;color:var(--accent);font-size:1.3rem;text-align:center;padding:2rem;">Cuddle Sleep Dream<br><span style="font-size:0.8rem;color:var(--text-muted);font-family:Inter,sans-serif;">Custom bodies + flugor</span></div>
+            <div class="card-body">
+              <div class="brand">Cuddle Sleep Dream (US)</div>
+              <h3>Custom Bow Tie & Suspender Bodies</h3>
+              <p class="desc">Välj färger själv. Baby Tux, Monogrammed Tie, Suspender Bodysuit. Från newborn.</p>
+              <div class="card-meta">
+                <span class="card-price">~280-330 kr</span>
+                <span class="card-size">Newborn+</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://www2.hm.com/sv_se/baby/pojkar/klader/visa-alla.html" target="_blank">
+            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#222,#333);font-family:'Playfair Display',serif;color:#fff;font-size:2rem;text-align:center;">H&M</div>
+            <div class="card-body">
+              <div class="brand">H&M Sverige</div>
+              <h3>3-piece Set med fluga</h3>
+              <p class="desc">Skjorta + byxor + fluga. Kolla sortimentet, det roterar. Finns ibland från 56.</p>
+              <div class="card-meta">
+                <span class="card-price">~200-300 kr</span>
+                <span class="card-size">Från 56</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://www.jacadi.us/newborn-boy" target="_blank">
+            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f5f0e8,#e8e0d0);font-family:'Playfair Display',serif;color:#2c3e50;font-size:1.8rem;text-align:center;">Jacadi<br><span style="font-size:0.8rem;font-family:Inter,sans-serif;color:#666;">Paris</span></div>
+            <div class="card-body">
+              <div class="brand">Jacadi Paris (Lyx)</div>
+              <h3>Poplin Rompers & Formella Bodys</h3>
+              <p class="desc">Franskt lyxmärke. Poplin, sammet, broderat. Tidlös elegans. Från storlek 50.</p>
+              <div class="card-meta">
+                <span class="card-price">~400-800 kr</span>
+                <span class="card-size">Från 50</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://www.amazon.com/Born-Love-Scally-Newsboy-Driver/dp/B00LWH132E" target="_blank">
+            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3d3124,#5c4a37);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:1rem;text-align:center;padding:2rem;">Accessoarer<br><span style="font-size:1.5rem;">&#127913;</span><br><span style="font-size:0.8rem;color:var(--text-muted);font-family:Inter,sans-serif;">Keps, hängslen, fluga</span></div>
+            <div class="card-body">
+              <div class="brand">Diverse (Amazon, Etsy)</div>
+              <h3>Newsboy Cap & Accessoarer</h3>
+              <p class="desc">Flat cap, newsboy keps, extra hängslen och flugor. Komplettera valfri outfit med vintage-gentleman-accessoarer.</p>
+              <div class="card-meta">
+                <span class="card-price">Från ~100 kr</span>
+                <span class="card-size">Newborn+</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Vilgots Garderob &middot; Gentleman Collection &middot; Kuraterat mars 2026
+    </footer>
+  </div>
+
+  <script>
+    // Simple password check
+    // Hash: SHA-256 of the password
+    const HASH = '2eb0e37fad33ebc118aae2ba8b4d7bc4a7d890c8cf0a63fdf62f885af9a762d2';
+
+    async function sha256(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function checkPass() {
+      const pw = document.getElementById('pw').value;
+      const hash = await sha256(pw);
+      if (hash === HASH) {
+        document.getElementById('gate').classList.add('hidden');
+        document.getElementById('content').classList.add('visible');
+        sessionStorage.setItem('vg_auth', '1');
+      } else {
+        document.getElementById('err').classList.add('show');
+        setTimeout(() => document.getElementById('err').classList.remove('show'), 2000);
+      }
+      return false;
+    }
+
+    // Auto-unlock if already authenticated in session
+    if (sessionStorage.getItem('vg_auth')) {
+      document.getElementById('gate').classList.add('hidden');
+      document.getElementById('content').classList.add('visible');
+    }
+  </script>
+</body>
+</html>
