@@ -314,10 +314,256 @@
       font-size: 0.88rem;
     }
 
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .card {
+      opacity: 0;
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.15s; }
+    .card:nth-child(4) { animation-delay: 0.2s; }
+    .card:nth-child(5) { animation-delay: 0.25s; }
+    .card:nth-child(6) { animation-delay: 0.3s; }
+    .card:nth-child(7) { animation-delay: 0.35s; }
+    .card:nth-child(8) { animation-delay: 0.4s; }
+
+    header { animation: fadeIn 1s ease; }
+    .section-header { animation: slideDown 0.5s ease; }
+    .size-note { animation: scaleIn 0.6s ease; }
+
+    /* Enhanced card hover */
+    .card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(201,169,110,0.05), transparent);
+      transition: left 0.5s;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      left: 100%;
+    }
+
+    .card-img {
+      transition: transform 0.5s ease, filter 0.5s ease;
+    }
+
+    .card:hover .card-img {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+
+    /* Card body slide up on hover */
+    .card-body {
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover .card-body {
+      transform: translateY(-2px);
+    }
+
+    /* Tag pulse on hover */
+    .card:hover .card-tag {
+      animation: pulse 1.5s ease infinite;
+    }
+
+    /* Enhanced gate */
+    .gate-box h1 {
+      background: linear-gradient(135deg, var(--accent), var(--accent-light), var(--accent));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+    }
+
+    .gate-box input {
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+
+    .gate-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(201,169,110,0.15);
+      transform: scale(1.02);
+    }
+
+    /* Enhanced header */
+    header h1 {
+      background: linear-gradient(135deg, var(--accent), #e4d5b7, var(--accent));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+    }
+
+    header .subtitle {
+      animation: fadeIn 1.5s ease 0.3s both;
+    }
+
+    header .note {
+      animation: fadeIn 1.5s ease 0.6s both;
+    }
+
+    /* Section counter badge */
+    .section-header .count {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+    }
+
+    /* Smooth scroll */
+    html { scroll-behavior: smooth; }
+
+    /* Enhanced badges */
+    .section-header .badge {
+      transition: transform 0.2s;
+    }
+
+    .section-header .badge:hover {
+      transform: scale(1.1);
+    }
+
+    /* Price highlight effect */
+    .card-price {
+      transition: color 0.3s;
+    }
+
+    .card:hover .card-price {
+      color: #e4d5b7;
+    }
+
+    /* Floating nav dots */
+    .nav-dots {
+      position: fixed;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      z-index: 100;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.3s, transform 0.3s;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+    }
+
+    .nav-dot:hover, .nav-dot.active {
+      background: var(--accent);
+      transform: scale(1.4);
+    }
+
+    .nav-dot[title]::after {
+      content: attr(title);
+      position: absolute;
+      right: 1.5rem;
+      white-space: nowrap;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    /* Back to top */
+    .back-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 100;
+    }
+
+    .back-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .back-top:hover {
+      transform: translateY(-2px) scale(1.1);
+    }
+
+    /* Product count in header */
+    .product-count {
+      display: inline-block;
+      font-size: 0.8rem;
+      color: var(--accent);
+      border: 1px solid rgba(201,169,110,0.3);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      margin-top: 1rem;
+      animation: fadeIn 2s ease 0.8s both;
+    }
+
     @media (max-width: 600px) {
       header h1 { font-size: 2.2rem; }
       .grid { grid-template-columns: 1fr; }
       .gate-box h1 { font-size: 1.8rem; }
+      .nav-dots { display: none; }
     }
   </style>
 </head>
@@ -341,6 +587,7 @@
       <h1>Vilgots Garderob</h1>
       <div class="subtitle">Gentleman Collection</div>
       <div class="note">Kostym, smoking, fluga &amp; hängslen i miniformat. Vardagsplagg med vuxen-vibe.</div>
+      <div class="product-count">35+ plagg kuraterade</div>
     </header>
 
     <!-- Size Note -->
@@ -962,8 +1209,181 @@
       </div>
     </div>
 
+    <!-- SAILOR & NAUTICAL -->
+    <div class="section" id="sailor">
+      <div class="section-header">
+        <h2>Sailor &amp; Nautisk Stil</h2>
+        <span class="badge">Klassiker</span>
+      </div>
+      <p class="section-desc">Sjömanskrage, knutar och poplin. Tidlös gentleman-vibe med nautiskt tema.</p>
+
+      <div class="grid">
+        <div class="card">
+          <a href="https://oneakids.com/products/sailor-knit-romper" target="_blank">
+            <img class="card-img" src="https://oneakids.com/cdn/shop/files/Sailor-Baby-Toddler-Romper.jpg?v=1772827287&width=600" alt="ONEA Sailor Romper">
+            <div class="card-body">
+              <span class="card-tag tag-rec">5.0 stjärnor</span>
+              <div class="brand">ONEA Kids</div>
+              <h3>Sailor Knit Romper</h3>
+              <p class="desc">Stickad sjömansromper i marinblå/vit. Eco-friendly nylon, stretchig och andbar. Navy &amp; White.</p>
+              <div class="card-meta">
+                <span class="card-price">~520 kr <span class="original">$90</span></span>
+                <span class="card-size">Från 3-6M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://oneakids.com/products/sailor-knit-romper" target="_blank">
+            <img class="card-img" src="https://oneakids.com/cdn/shop/files/Sailor-Baby-Toddler-Romper-3.jpg?v=1772899417&width=600" alt="ONEA Sailor Romper detail">
+            <div class="card-body">
+              <div class="brand">ONEA Kids</div>
+              <h3>Sailor Knit Romper (Detalj)</h3>
+              <p class="desc">Närbild på sjömanskragen och knuten. Mjuk stickad kvalitet.</p>
+              <div class="card-meta">
+                <span class="card-price">~520 kr</span>
+                <span class="card-size">Från 3-6M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://www.janieandjack.com/item/newborn-boy-the-gingham-sailor-baby-romper-100045502.html" target="_blank">
+            <img class="card-img" src="https://i1.adis.ws/i/janieandjack/100045502_JJ/color?$PDP_main$" alt="Janie and Jack Sailor Romper">
+            <div class="card-body">
+              <span class="card-tag tag-sale">75% Rea</span>
+              <div class="brand">Janie and Jack</div>
+              <h3>Gingham Sailor Baby Romper</h3>
+              <p class="desc">Blårutig poplin med sjömanskrage, knut och grosgrain-trim. 100% bomull, helfodrad.</p>
+              <div class="card-meta">
+                <span class="card-price">~170 kr <span class="original">655 kr</span></span>
+                <span class="card-size">Från 0-3M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- KNIT SETS -->
+    <div class="section" id="knit">
+      <div class="section-header">
+        <h2>Stickade Set</h2>
+        <span class="badge">Premium</span>
+      </div>
+      <p class="section-desc">Handgjorda och maskintvättbara stickade set. Klassisk look, 100% bomull. Perfekt för kallare dagar.</p>
+
+      <div class="grid">
+        <div class="card">
+          <a href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">
+            <img class="card-img" src="https://cdn11.bigcommerce.com/s-ya1gqmao/images/stencil/500x659/products/1115/9095/17__67790.1768325648.png" alt="Feltman Pocket Knit Set">
+            <div class="card-body">
+              <div class="brand">Feltman Brothers</div>
+              <h3>Pocket Knit Set</h3>
+              <p class="desc">Stickad tröja med ficka + byxor. 100% bomull, maskintvättbar. Tidlös elegans.</p>
+              <div class="card-meta">
+                <span class="card-price">~710 kr ($68)</span>
+                <span class="card-size">Newborn+</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">
+            <img class="card-img" src="https://cdn11.bigcommerce.com/s-ya1gqmao/images/stencil/500x659/products/759/4444/4803__87031.1724307825.jpg" alt="Feltman Diamond Knit Set">
+            <div class="card-body">
+              <div class="brand">Feltman Brothers</div>
+              <h3>Piqu&eacute; Collar Diamond Knit 2-Piece</h3>
+              <p class="desc">Diamantstickad tröja med piqu&eacute;-krage + byxor + mössa. Dressad men bekväm.</p>
+              <div class="card-meta">
+                <span class="card-price">~680 kr ($65)</span>
+                <span class="card-size">Newborn+</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">
+            <img class="card-img" src="https://cdn11.bigcommerce.com/s-ya1gqmao/images/stencil/500x659/products/640/4040/4802__89295.1562269176.jpg" alt="Feltman Special Occasion Knit">
+            <div class="card-body">
+              <div class="brand">Feltman Brothers</div>
+              <h3>Special Occasion Knit 2-Piece</h3>
+              <p class="desc">Festset med kabelstickad detalj. 100% bomull. Perfekt för dop eller fotografering.</p>
+              <div class="card-meta">
+                <span class="card-price">~815 kr ($78)</span>
+                <span class="card-size">Newborn+</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://feltmanbrothers.com/baby-boy/sweater-knit-sets" target="_blank">
+            <img class="card-img" src="https://cdn11.bigcommerce.com/s-ya1gqmao/images/stencil/500x659/products/621/4647/4801__96236.1638383835.jpg" alt="Feltman Cable Knit Set">
+            <div class="card-body">
+              <div class="brand">Feltman Brothers</div>
+              <h3>Cable Knit Two Piece with Hat</h3>
+              <p class="desc">Kabelstickad tröja + byxor + matchande mössa. Klassisk gentleman-baby.</p>
+              <div class="card-meta">
+                <span class="card-price">~700 kr ($67)</span>
+                <span class="card-size">Newborn+</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- DRESSY ROMPERS -->
+    <div class="section" id="rompers">
+      <div class="section-header">
+        <h2>Dressade Rompers</h2>
+        <span class="badge">Vardagselegans</span>
+      </div>
+      <p class="section-desc">Rompers med väst-look, kragar och detaljer. En-delat men ser flerdelat ut.</p>
+
+      <div class="grid">
+        <div class="card">
+          <a href="https://kaiterfly.com/products/dressy-waistcoat-style-1-piece-romper-for-infant-boys-green" target="_blank">
+            <img class="card-img" src="https://kaiterfly.com/cdn/shop/files/Romper_IMG6.0_cdf38093-b3bc-4f43-b90d-c7191630e62f.png?v=1742032296&width=600" alt="KaiterFly Waistcoat Romper">
+            <div class="card-body">
+              <div class="brand">KaiterFly</div>
+              <h3>Dressy Waistcoat Romper (Grön)</h3>
+              <p class="desc">En-delad romper med inbyggd väst-look. Ser ut som skjorta + väst + byxor men är ett plagg.</p>
+              <div class="card-meta">
+                <span class="card-price">~260 kr <span class="original">$28</span></span>
+                <span class="card-size">Från 0-3M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="card">
+          <a href="https://www.amazon.com/Fairy-Baby-Gentleman-Jumpsuit-Clothes/dp/B09724VHWP" target="_blank">
+            <div class="card-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#5c4a37,#3d2e1f);font-family:'Playfair Display',serif;color:var(--accent-light);font-size:0.95rem;text-align:center;padding:1.5rem;line-height:1.4;">Väst + Fluga<br>+ Byxor<br><span style="font-size:0.75rem;color:var(--text-muted);font-family:Inter,sans-serif;margin-top:0.5rem;display:block;">3-delat, Brun</span></div>
+            <div class="card-body">
+              <div class="brand">Amazon</div>
+              <h3>Gentleman Waistcoat Tuxedo Onesie</h3>
+              <p class="desc">Romper med väst, fluga och byxor i brun. 3-delat set. Budget-alternativ.</p>
+              <div class="card-meta">
+                <span class="card-price">~200 kr</span>
+                <span class="card-size">Från 3-6M</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back to top button -->
+    <button class="back-top" id="backTop" onclick="window.scrollTo({top:0})">&#8593;</button>
+
     <footer>
-      Vilgots Garderob &middot; Gentleman Collection &middot; Kuraterat mars 2026
+      Vilgots Garderob &middot; Gentleman Collection &middot; 35+ plagg &middot; Kuraterat mars 2026
     </footer>
   </div>
 
@@ -996,6 +1416,30 @@
       document.getElementById('gate').classList.add('hidden');
       document.getElementById('content').classList.add('visible');
     }
+
+    // Back to top button
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('backTop');
+      if (window.scrollY > 600) {
+        btn.classList.add('visible');
+      } else {
+        btn.classList.remove('visible');
+      }
+    });
+
+    // Intersection Observer for scroll-triggered animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.card').forEach(card => {
+      card.style.animationPlayState = 'paused';
+      observer.observe(card);
+    });
   </script>
 </body>
 </html>
