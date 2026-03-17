@@ -857,16 +857,15 @@ curl -sL -o /dev/null -w 'HTTP %{http_code}: FILNAMN\n' "https://mikbol.github.i
 
 **Fail:** Något av ovanstående stämmer inte. Felsök, fixa, push igen, verifiera igen.
 
-### Kända pre-existing problem (inte orsakade av auto-discovery)
+### Pre-existing problem (fixade 2026-03-17)
 
-Dessa fanns innan auto-discovery implementerades och berörs inte av den:
-
-| Problem | Antal | Detaljer |
-|---|---|---|
-| Trasig bild | 1 | `lilax-tux-grey.webp` (Gentleman Tuxedo Footie) |
-| Köp-länkar till samlingssidor | 13 | 7× The Tiny Universe → /collections/suits-tuxedos, 4× Jacadi → /collections/newborn-boy, 2× Etsy → /market/ |
-
-Dessa bör fixas separat men blockerar inte auto-discovery.
+| Problem | Åtgärd |
+|---|---|
+| Trasig bild `lilax-tux-grey.webp` | Bytt till `.jpg` (var JPEG med fel filändelse) |
+| 7 Tiny Universe samlingslänkar | Bytta till produktsidor (`/products/...`) |
+| 3 Jacadi samlingslänkar | Bytta till produktsidor |
+| 1 Jacadi utgången produkt | Borttagen (hittades inte på sajten) |
+| 2 Etsy söklänkar | Behålls (kategori-sökningar, inte specifika produkter) |
 
 ### 7.4 Full körning (alla 5 agenter)
 
