@@ -49,12 +49,12 @@ command -v curl >/dev/null 2>&1 || die "curl required"
 [ -f "$HTML_FILE" ] || die "index.html not found at $HTML_FILE"
 [ -f "$HELPER" ] || die "json-helper.py not found at $HELPER"
 
-# File lock to prevent concurrent modifications
+# File lock to prevent concurrent modifications (macOS-kompatibel, mkdir är atomärt)
 acquire_lock() {
-    exec 200>"$LOCKFILE"
-    if ! flock -n 200; then
+    if ! mkdir "$LOCKFILE.d" 2>/dev/null; then
         die "Another add-item.sh is running. Try again."
     fi
+    trap 'rm -rf "$LOCKFILE.d"' EXIT
 }
 
 # Safe filename generation
@@ -113,6 +113,25 @@ detect_ext() {
     esac
 }
 
+# Valid sections (single source of truth)
+VALID_SECTIONS=(
+    "The Tiny Universe"
+    "Lulu Babe"
+    "Custom & Handgjort"
+    "Cuddle Sleep Dream"
+    "H&M"
+    "Jacadi Paris"
+    "Accessoarer"
+    "Sailor & Nautisk Stil"
+    "Stickade Set"
+    "Dressade Rompers"
+    "Childrensalon: Formal"
+    "Childrensalon: Blazers & Hängslen"
+    "Childrensalon: Skor & Accessoarer"
+    "Lilax: Tuxedo Footies"
+    "Childrensalon: Buster Suits"
+)
+
 # ===== COMMANDS =====
 
 cmd_add() {
@@ -149,6 +168,53 @@ cmd_add() {
     [ -n "$url" ] || die "Missing --url"
     if [ "$no_image" = false ] && [ -z "$image_url" ] && [ -z "$placeholder_text" ]; then
         die "Missing --image-url (or use --no-image / --placeholder-text)"
+    fi
+
+    # === Strict validation ===
+
+    # URL must be HTTPS
+    [[ "$url" =~ ^https:// ]] || die "URL must start with https://"
+    # Block search engine URLs
+    [[ "$url" =~ (google\.com|bing\.com|duckduckgo\.com|yahoo\.com|search\.) ]] && \
+        die "URL is a search engine URL, not a product page"
+    # Block too-short URLs
+    [[ ${#url} -ge 20 ]] || die "URL too short (min 20 chars)"
+
+    # Price must contain digit and currency
+    [[ "$price" =~ [0-9] ]] || die "Price must contain at least one digit: '$price'"
+    [[ "$price" =~ (kr|KR|SEK|DKK|NOK|USD|GBP|EUR|AUD|CAD|JPY|CHF|[\$£€¥]) ]] || \
+        die "Price must contain a currency (kr, \$, £, €, or ISO code): '$price'"
+    [[ ${#price} -le 30 ]] || die "Price too long (max 30 chars): '$price'"
+
+    # Name length
+    [[ ${#name} -ge 3 ]] || die "Name too short (min 3 chars)"
+    [[ ${#name} -le 120 ]] || die "Name too long (max 120 chars)"
+
+    # Brand required and length
+    [ -n "$brand" ] || die "Missing --brand (required)"
+    [[ ${#brand} -ge 2 ]] || die "Brand too short (min 2 chars)"
+    [[ ${#brand} -le 60 ]] || die "Brand too long (max 60 chars)"
+
+    # Size format
+    if [ -n "$size" ]; then
+        [[ "$size" =~ ^Från\ [0-9A-Z] ]] || \
+            die "Invalid size format: '$size'. Expected 'Från 62', 'Från NB', 'Från 3M', etc."
+    fi
+
+    # Section whitelist
+    if [ -n "$section" ]; then
+        local valid=false
+        for s in "${VALID_SECTIONS[@]}"; do
+            [[ "$s" == "$section" ]] && valid=true && break
+        done
+        [ "$valid" = true ] || die "Invalid section: '$section'. Run './add-item.sh sections' to list valid sections."
+    fi
+
+    # Image URL validation
+    if [ "$no_image" = false ] && [ -n "$image_url" ]; then
+        [[ "$image_url" =~ ^https:// ]] || die "Image URL must start with https://"
+        [[ "$image_url" =~ (google\.com/search|bing\.com/images) ]] && \
+            die "Image URL is a search page, not a direct image link"
     fi
 
     acquire_lock
@@ -278,6 +344,12 @@ cmd_exists() {
     eval python3 "$HELPER" exists "$HTML_FILE" $args
 }
 
+cmd_sections() {
+    for s in "${VALID_SECTIONS[@]}"; do
+        echo "$s"
+    done
+}
+
 cmd_remove() {
     local id=""
     while [[ $# -gt 0 ]]; do
@@ -294,7 +366,7 @@ cmd_remove() {
 # ===== MAIN =====
 
 if [[ $# -lt 1 ]]; then
-    echo "Usage: $0 {add|list|count|exists|remove} [options]"
+    echo "Usage: $0 {add|list|count|exists|remove|sections} [options]"
     exit 1
 fi
 
@@ -307,5 +379,6 @@ case "$command" in
     count) cmd_count "$@" ;;
     exists) cmd_exists "$@" ;;
     remove) cmd_remove "$@" ;;
+    sections) cmd_sections ;;
     *) die "Unknown command: $command" ;;
 esac

@@ -1,19 +1,66 @@
 # Plan: Automatisk produktuppdatering med AI-agenter
 
 Beslutad: 2026-03-16
-Uppdaterad: 2026-03-17 (härdning, engine-val, valuta, sandbox-research)
+Uppdaterad: 2026-03-17 (steg 1-5 implementerade, modellval avgjort)
 
 ## Mål
 
-Sajten https://mikbol.github.io/vilgot-garderob/ uppdateras automatiskt med nya gentleman-babykläder. OpenCode-agenter med gratis modell söker webben, hittar produkter, och anropar `add-item.sh`. Ett cron-jobb kör agenterna och pushar till GitHub.
+Sajten https://mikbol.github.io/vilgot-garderob/ uppdateras automatiskt med nya gentleman-babykläder. OpenCode-agenter söker webben, hittar produkter, och anropar `add-item.sh`. Ett cron-jobb kör agenterna och pushar till GitHub.
 
 ## Beslut
 
 - **Engine:** OpenCode (primär och enda). Claude Code är inte ett alternativ.
-- **Modell:** Gratis modell via OpenCode (konfigureras i `opencode.json`).
+- **Modell:** Gratis via OpenCode Zen. Se modellval-research nedan.
 - **Valutor:** Alla accepteras (3-bokstavs ISO-koder + symboler).
 - **Notiser:** Inte prioriterat. Kan läggas till senare vid behov.
 - **Sandbox:** OpenCode i Docker-container undersöks separat (se `opencode/research/docker-sandbox.md`).
+
+## Modellval (research 2026-03-17)
+
+Fyra alternativ utvärderade:
+
+| Alternativ | Kostnad | Websearch | Kvalitet | Begränsning |
+|---|---|---|---|---|
+| **OpenCode Zen (gratis modeller)** | **$0** | **Ja (Exa, gratis)** | **Medel-hög** | **Kräver Zen-konto. Gratis modeller kan försvinna.** |
+| GitHub Copilot Free | $0 | Ja (via OpenCode) | Hög | 50 requests/mån (för lite) |
+| GitHub Copilot Pro | $10/mån | Ja (via OpenCode) | Hög (Sonnet 4.6) | 300 premium requests/mån |
+| Ollama (lokalt) | $0 | Nej | Låg-medel | Ingen websearch, svagare modeller |
+
+### Valt: OpenCode Zen med gratis modell
+
+OpenCode har en egen modell-gateway (Zen) med gratis modeller. Dessa är tillfälligt gratis (modell-leverantörer samlar användningsdata) men fungerar fullt ut.
+
+Tillgängliga gratis Zen-modeller (mars 2026):
+- GPT 5 Nano (lättvikt)
+- Big Pickle
+- MiMo V2 Flash Free
+- Nemotron 3 Super Free
+- MiniMax M2.5 Free
+
+Websearch fungerar via Exa AI (inbyggt i OpenCode, kräver ingen API-nyckel). Aktiveras med `OPENCODE_ENABLE_EXA=1` eller automatiskt vid Zen-anslutning.
+
+**Setup:**
+1. Kör `opencode` interaktivt
+2. Kör `/connect`, välj "OpenCode Zen"
+3. Skapa konto (gratis)
+4. Välj en av de gratis modellerna
+5. Modellen sparas och återanvänds av orchestrate.sh
+
+**Modell anges inte i opencode.json** (bestäms av vad som konfigureras via `/connect`). Om en specifik modell ska låsas, lägg till `"model": "zen/MODELLNAMN"` i opencode.json.
+
+### Alternativ
+
+**GitHub Copilot** ($10/mån): Bättre modellkvalitet (Sonnet 4.6) men kostar. Setup: `/connect` > "GitHub Copilot" > device login. Ändra `"model"` i opencode.json till `"github-copilot/claude-sonnet-4-6"`.
+
+**Ollama** ($0, helt lokalt): Ingen websearch, ingen molntjänst. Agenten kan bara använda webfetch med kända URL:er. Setup: installera Ollama, ladda ned modell, ändra `"model"` i opencode.json till `"ollama/qwen2.5-coder:32b"`.
+
+### Risker med gratis Zen-modeller
+
+- Kan försvinna utan förvarning (leverantören slutar erbjuda dem gratis)
+- Kvaliteten varierar; kan vara för svag för att följa agent-prompten korrekt
+- Om alla gratis modeller försvinner: byt till Copilot eller Ollama
+
+Om testningen (steg 7) visar att den valda Zen-modellen inte klarar uppgiften (hittar inga produkter, hallucerar, misslyckas med add-item.sh), testa en annan Zen-modell eller byt till Copilot.
 
 ## Säkerhetsmodell
 
@@ -28,26 +75,33 @@ Om agenten hallucerar, skickar skräp, eller försöker köra oväntade kommando
 ## Redan klart
 
 - [x] `index.html` med `const PRODUCTS = [...]` (68 produkter, JSON-driven rendering)
-- [x] `add-item.sh` (add, list, count, exists, remove, flock-lås, bildverifiering via magic bytes, dedup)
+- [x] `add-item.sh` (add, list, count, exists, remove, sections, flock-lås, bildverifiering via magic bytes, dedup, strikt validering)
 - [x] `json-helper.py` (raw_decode, atomic writes)
 - [x] Research: agent-orkestrering, OpenCode, Shopify API, scraping, AI-discovery
+- [x] `opencode.json` (permissions, modell, agent-definition)
+- [x] `agents/product-scout.md` (6-stegs arbetsflöde, regler)
+- [x] `orchestrate.sh` (5 agenter, dry-run, single, timeout, roterande sökfokus)
+- [x] `.gitignore` (logs/, .add-item.lock, *.tmp, index.html.bak)
+- [x] Härdning av add-item.sh: URL, pris, sektion, storlek, namn, brand, bild-URL (8/8 tester OK)
+- [x] Modellval: research och beslut (OpenCode Zen gratis modell, Copilot/Ollama som fallback)
+- [x] Testskript: `test-auto-discovery.sh` (validering + OpenCode + pipeline)
 
-## Filer som ska skapas/ändras
+## Filer
 
 ```
 vilgot-kläder/site/
-├── add-item.sh               # ÄNDRA: lägg till strikt validering (steg 1)
-├── opencode.json              # NY: OpenCode projektkonfig (steg 2)
+├── add-item.sh               # KLAR: strikt validering, sections-kommando
+├── opencode.json              # KLAR: permissions, modell, agent
 ├── agents/
-│   └── product-scout.md       # NY: Agent-definition (steg 3)
-├── orchestrate.sh             # NY: Huvudskript (steg 4)
-├── logs/                      # NY: Agent-loggar (gitignored)
-└── .gitignore                 # NY: Ignorera logs/, .add-item.lock, *.tmp
+│   └── product-scout.md       # KLAR: agent-definition
+├── orchestrate.sh             # KLAR: huvudskript (dry-run testad)
+├── logs/                      # KLAR: gitignored
+└── .gitignore                 # KLAR
 ```
 
 ---
 
-## Steg 1: Härdning av add-item.sh
+## Steg 1: Härdning av add-item.sh ✅ (implementerad 2026-03-17, 8/8 tester OK)
 
 Alla valideringar sker i skriptet. Agenten kan inte kringgå dem.
 
@@ -199,15 +253,13 @@ Kör dessa tester efter implementering. Alla ska ge felmeddelande och exit 1:
 
 ---
 
-## Steg 2: OpenCode projektkonfig
+## Steg 2: OpenCode projektkonfig ✅
 
-**Fil:** `opencode.json`
-
-Modell och provider konfigureras till en gratis modell. Exakt vilken avgörs vid implementation (beror på vad OpenCode stödjer och vad som har websearch/webfetch).
+**Fil:** `opencode.json` (implementerad 2026-03-17)
 
 ```json
 {
-  "model": "GRATIS_MODELL_HÄR",
+  "model": "github-copilot/claude-sonnet-4-6",
   "permission": {
     "bash": {
       "*": "deny",
@@ -253,7 +305,7 @@ Modell och provider konfigureras till en gratis modell. Exakt vilken avgörs vid
 
 ---
 
-## Steg 3: Agent-definition
+## Steg 3: Agent-definition ✅ (implementerad 2026-03-17)
 
 **Fil:** `agents/product-scout.md`
 
@@ -336,7 +388,7 @@ Verifiera att add-item.sh returnerade `"status": "added"`. Om den returnerade et
 
 ---
 
-## Steg 4: Orkestreringsscript
+## Steg 4: Orkestreringsscript ✅ (implementerad 2026-03-17, dry-run OK)
 
 **Fil:** `orchestrate.sh`
 
@@ -513,7 +565,7 @@ echo "Logs: $LOG_DIR/${DATE}_agent-*"
 
 ---
 
-## Steg 5: .gitignore
+## Steg 5: .gitignore ✅ (implementerad 2026-03-17)
 
 **Fil:** `.gitignore`
 
@@ -528,7 +580,20 @@ index.html.bak
 
 ## Steg 6: Schemaläggning
 
-### macOS launchd
+### Vad är launchd?
+
+launchd är macOS inbyggda schemaläggare (motsvarar cron på Linux, men bättre integrerad). Apple har ersatt cron med launchd sedan macOS 10.4.
+
+**Så fungerar det:**
+- En XML-fil (plist) beskriver VAD som ska köras och NÄR
+- Filen placeras i `~/Library/LaunchAgents/` (per-användare) eller `/Library/LaunchDaemons/` (systemvid)
+- `launchctl` är kommandot för att ladda, avladda och inspektera jobb
+- macOS läser plisten vid inloggning och kör jobbet enligt schema
+- Om datorn sov vid schemalagd tid körs jobbet vid nästa uppvakning
+
+**Skillnad mot cron:** launchd hanterar beroenden, kan starta jobb vid filändringar (inte bara tid), loggar stdout/stderr automatiskt, och återstartar crashade processer.
+
+### Plist-fil
 
 **Fil:** `~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist`
 
@@ -557,8 +622,6 @@ index.html.bak
     <string>/tmp/vilgot-discovery.err</string>
     <key>EnvironmentVariables</key>
     <dict>
-        <key>ANTHROPIC_API_KEY</key>
-        <string>REPLACE_WITH_ACTUAL_KEY</string>
         <key>PATH</key>
         <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
         <key>OPENCODE_ENABLE_EXA</key>
@@ -568,108 +631,161 @@ index.html.bak
 </plist>
 ```
 
-### Öppen fråga: PATH och API-nyckel
+### Förutsättningar
 
-- **API-nyckel:** Om den gratis modellen inte kräver API-nyckel kan `ANTHROPIC_API_KEY` tas bort ur plisten. Om den behöver en nyckel (t.ex. OpenRouter free tier) läggs den till här.
-- **PATH:** Behöver inkludera katalogen där `opencode` är installerad. Kör `which opencode` för att avgöra.
+- **OpenCode Zen:** Måste vara konfigurerad innan launchd-jobbet fungerar. Kör `opencode` interaktivt, sedan `/connect` > "OpenCode Zen" > skapa konto > välj gratis modell. Autentiseringen sparas i `~/.config/opencode/` och återanvänds.
+- **PATH:** Måste inkludera katalogen där `opencode` är installerad. Kör `which opencode` för att kontrollera.
+- **Ingen API-nyckel behövs** i plisten (Zen autentiserar via sparad session).
 
 ### Installation
 
 ```bash
 cp vilgot-garderob.discovery.plist ~/Library/LaunchAgents/
 launchctl load -w ~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist
-launchctl list | grep vilgot  # verifiera
+launchctl list | grep vilgot  # verifiera: ska visa PID eller status
 ```
 
-Kör söndagar kl 10:00. Om Mac:en sov vid den tiden körs jobbet vid nästa uppvakning.
+### Daglig användning och underhåll
+
+```bash
+# Se om jobbet är laddat och senaste status
+launchctl list | grep vilgot
+# Kolumn 1: PID (- = inte igång), Kolumn 2: senaste exit code (0 = OK), Kolumn 3: label
+
+# Kör jobbet manuellt (utan att vänta på schema)
+launchctl start local.vilgot-garderob.discovery
+
+# Se loggar från senaste körning
+cat /tmp/vilgot-discovery.log
+cat /tmp/vilgot-discovery.err
+
+# Stoppa/avladda jobbet tillfälligt
+launchctl unload ~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist
+
+# Ladda igen
+launchctl load -w ~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist
+```
+
+### Ändra schema
+
+Redigera `StartCalendarInterval` i plisten. Exempel:
+
+```xml
+<!-- Varje söndag kl 10:00 (nuvarande) -->
+<key>Weekday</key><integer>0</integer>
+<key>Hour</key><integer>10</integer>
+
+<!-- Varje dag kl 08:00 -->
+<!-- Ta bort Weekday-raden, behåll bara Hour + Minute -->
+
+<!-- Varannan vecka: finns inte i launchd, lös via orchestrate.sh (kolla veckonummer) -->
+```
+
+Efter ändring: `launchctl unload` + `launchctl load -w` för att plisten läses om.
+
+### Avinstallation
+
+```bash
+launchctl unload ~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist
+rm ~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist
+```
+
+### Felsökning
+
+| Problem | Kommando | Lösning |
+|---|---|---|
+| Jobbet körs inte | `launchctl list \| grep vilgot` | Om det inte syns: `launchctl load -w ...` |
+| Exit code ≠ 0 | `cat /tmp/vilgot-discovery.err` | Läs felet, fixa, kör `launchctl start ...` |
+| opencode not found | `cat /tmp/vilgot-discovery.err` | Uppdatera PATH i plisten |
+| Zen-session utgången | Kör `opencode` interaktivt, `/connect` | Autentisera på nytt |
+
+### Vad Claude/agenten behöver veta
+
+Claude behöver normalt inte röra launchd. Undantag:
+- Om Mikael ber om schemaändring: redigera plisten, unload + load
+- Om Mikael rapporterar att auto-discovery slutat fungera: kolla `launchctl list`, loggar, och Zen-session
+- Om orchestrate.sh byter sökväg: uppdatera `Program`-raden i plisten
 
 ---
 
-## Steg 7: Första testkörning (manuell)
+## Steg 7: Validering (vad Claude ska köra)
 
-Kör stegen i ordning. Varje steg måste lyckas innan nästa.
+All validering görs via `test-auto-discovery.sh` och tre manuella steg. Claude ska följa denna sektion vid varje end-to-end-körning.
 
-### 7.1 Verifiera add-item.sh-validering
-
-Kör testfallen från steg 1.8. Alla ogiltiga inputs ska avvisas.
-
-### 7.2 Verifiera att OpenCode fungerar headless
+### 7.1 Automatiska tester
 
 ```bash
 cd /Users/bolm/AI-Assistent/vilgot-kläder/site
-opencode run "Svara med exakt texten: HELLO" -q
+./test-auto-discovery.sh
 ```
 
-Förväntat: `HELLO` (eller liknande kort svar).
+Täcker: filer, beroenden, add-item.sh-validering (8 tester), count/list, orchestrate dry-run, OpenCode headless/websearch/permissions. Alla PASS krävs (SKIP för launchd är OK innan steg 6).
 
-### 7.3 Verifiera websearch
-
-```bash
-opencode run "Använd websearch för att söka efter 'baby tuxedo romper'. Lista 3 resultat med titel och URL." -q
-```
-
-Förväntat: 3 sökresultat med faktiska URL:er.
-
-### 7.4 Verifiera att agenten kan köra add-item.sh
-
-```bash
-opencode run "Kör kommandot: ./add-item.sh count" -q
-```
-
-Förväntat: `68` (eller aktuellt antal).
-
-### 7.5 Verifiera att agenten INTE kan köra remove
-
-```bash
-opencode run "Kör kommandot: ./add-item.sh remove --id 1" -q
-```
-
-Förväntat: permission denied (blockerat av opencode.json).
-
-### 7.6 Testkörning med en agent (dry-run)
-
-```bash
-./orchestrate.sh --single 0 --dry-run
-```
-
-Förväntat: visar vad som skulle köras utan att göra något.
-
-### 7.7 Testkörning med en agent (skarpt, utan push)
+### 7.2 Skarpt agenttest (utan push)
 
 ```bash
 ./orchestrate.sh --single 0 --no-push
 ```
 
-Förväntat: Agenten söker, hittar 0-3 produkter, lägger till via add-item.sh. Commit skapas lokalt men pushas inte.
+Förväntat: agenten söker webben, hittar 0-3 produkter, lägger till via add-item.sh. Lokal commit skapas.
 
 Kontrollera efteråt:
+
 ```bash
-./add-item.sh count          # Bör vara >= 68
-git log --oneline -3         # Se commit
-cat logs/*agent-0*           # Se agentens logg
+# Antal produkter (ska vara >= vad det var innan)
+./add-item.sh count
+
+# Se commit
+git log --oneline -3
+
+# Läs agentloggen: verifiera att agenten körde websearch, webfetch, exists, sections, add
+cat logs/*agent-0*.log | tail -30
+
+# Verifiera att nya bilder finns (om produkter lades till)
+ls -lt img/ | head -5
 ```
 
-### 7.8 Verifiera att sidan renderar korrekt
+**Vad Claude ska kontrollera i loggen:**
+- Agenten använde websearch (rad med "Exa Web Search")
+- Agenten verifierade via webfetch (rad med "WebFetch https://...")
+- Agenten kollade duplikat (`./add-item.sh exists`)
+- Agenten hämtade sektioner (`./add-item.sh sections`)
+- Om add-item.sh returnerade ERROR: var felet rimligt? (t.ex. pris utan valuta, redan finns)
+- Om agenten inte hittade några produkter: kontrollera att den faktiskt sökte (inte bara gav upp)
 
-Öppna `index.html` i browser lokalt och kontrollera:
-- Alla befintliga produkter visas
-- Eventuella nya produkter visas i rätt sektion
+**Om 0 produkter lades till men agenten körde korrekt:** det är OK. Kan bero på att alla hittade produkter redan fanns eller att bildnedladdning blockerades.
+
+**Om agenten kraschade (exit ≠ 0):** läs loggen, identifiera felet, fixa, kör igen.
+
+### 7.3 Verifiera rendering
+
+```bash
+open index.html
+```
+
+Kontrollera i browsern:
+- Alla produktkort visas (inga tomma sektioner)
+- Nya produkter syns i rätt sektion
 - Bilder laddas (inga trasiga bildikoner)
+- Sökfunktion fungerar
 - Dark/light mode fungerar
 
-### 7.9 Full testkörning (alla agenter, med push)
+### 7.4 Full körning (alla agenter, med push)
+
+Kör bara efter att 7.1-7.3 lyckats.
 
 ```bash
 ./orchestrate.sh
 ```
 
-Vänta 5-15 min. Kontrollera:
+Tar 5-25 minuter (5 agenter × 1-5 min/agent). Kontrollera efteråt:
+
 ```bash
 git log --oneline -5
 ./add-item.sh count
 ```
 
-Ladda sajten: https://mikbol.github.io/vilgot-garderob/ (vänta 1-2 min efter push).
+Verifiera live-sajten (vänta 1-2 min efter push): https://mikbol.github.io/vilgot-garderob/
 
 ---
 
@@ -688,7 +804,7 @@ Uppdatera PATH i launchd-plisten.
 ### `websearch` returnerar inga resultat
 
 ```bash
-OPENCODE_ENABLE_EXA=true opencode run "Sök efter baby tuxedo" -q
+OPENCODE_ENABLE_EXA=true opencode run "Sök efter baby tuxedo"
 ```
 
 Om Exa är nere finns ingen automatisk fallback. Vänta och kör igen nästa vecka.
@@ -743,67 +859,112 @@ git add index.html && git commit -m "remove: felaktig produkt" && git push
 
 ---
 
+## Steg 10: Avinstallation
+
+### Beslut (2026-03-17)
+
+Det enda som behöver städas vid avinstallation är **launchd-jobbet**. Övriga filer (skript, loggar, bilder, config) lever i git-repot och gör ingen skada om de ligger kvar. De tar minimal plats och är versionshanterade.
+
+### Vid avinstallation: städa launchd
+
+```bash
+# Stoppa och ta bort det schemalagda jobbet
+launchctl unload ~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist 2>/dev/null
+rm -f ~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist
+
+# Verifiera att det är borta
+launchctl list | grep vilgot    # ska ge tomt resultat
+
+# Rensa launchd-loggar (valfritt, ligger i /tmp och försvinner vid omstart)
+rm -f /tmp/vilgot-discovery.log /tmp/vilgot-discovery.err
+```
+
+Det är allt. Utan launchd-jobbet körs inget automatiskt. Skripten i repot är bara filer, de gör inget av sig själva.
+
+### Varför resten kan ligga kvar
+
+| Fil/katalog | Varför den inte behöver städas |
+|---|---|
+| `orchestrate.sh`, `opencode.json`, `agents/` | Inerta filer i git. Körs inte utan att någon aktivt startar dem. |
+| `add-item.sh` (härdad) | Valideringen förbättrar skriptet oavsett om auto-discovery används. |
+| `test-auto-discovery.sh` | Testskript. Användbart om systemet ska återaktiveras. |
+| `logs/` | Gitignored, ~260 KB/år. Försvinner vid `rm -rf logs/*`. |
+| `.gitignore` | Förhindrar att loggar och lockfiler hamnar i git. Gör ingen skada. |
+| `~/.config/opencode/` | Delas med alla OpenCode-projekt. Rör den inte. |
+
+---
+
 ## Kostnad
 
-Gratis modell via OpenCode = $0/mån. Enda kostnaden är bandbredd för bildnedladdning (försumbar).
+OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. Om alla gratis modeller försvinner: GitHub Copilot Pro $10/mån (300 premium requests) eller Ollama $0 (begränsad funktion).
 
 ---
 
 ## Exekveringsordning
 
 ```
-1. Härda add-item.sh (validering + sections-kommando)  (20 min)
-2. Testa valideringen (steg 1.8)                       (10 min)
-3. Skapa opencode.json                                 (5 min)
-4. Skapa agents/product-scout.md                       (5 min)
-5. Skapa orchestrate.sh + chmod +x                     (5 min)
-6. Skapa .gitignore                                    (1 min)
-7. Testa steg 7.1-7.5 (validering + permissions)       (10 min)
-8. Testa steg 7.6-7.7 (dry-run + single agent)         (10 min)
-9. Verifiera rendering steg 7.8                        (5 min)
-10. Full körning steg 7.9                              (15 min)
-11. Installera launchd steg 6                          (5 min)
-12. Commit allt och push                               (2 min)
+1.  ✅ Härda add-item.sh (validering + sections-kommando)
+2.  ✅ Testa valideringen (steg 1.8, 8/8 OK)
+3.  ✅ Skapa opencode.json (permissions, agent, nemotron-3-super-free)
+4.  ✅ Skapa agents/product-scout.md
+5.  ✅ Skapa orchestrate.sh + chmod +x
+6.  ✅ Skapa .gitignore
+7.  ✅ Skapa test-auto-discovery.sh (validering + OpenCode-pipeline)
+8.  ✅ Konfigurera OpenCode Zen (/connect, gratis modell)
+9.  ✅ Kör ./test-auto-discovery.sh (27/27 PASS)
+10. ✅ Skarpt agenttest (3 produkter tillagda, lokal commit)
+11. ⬜ Verifiera rendering (steg 7.3)
+12. ⬜ Full körning alla agenter (steg 7.4)
+13. ⬜ Installera launchd (steg 6)
+14. ⬜ Commit allt och push
 ```
-
-Total tid: ~95 min.
 
 ---
 
 ## Acceptanskriterier
 
-### Validering (steg 1)
+### Validering (steg 1) ✅
 
-- [ ] `add-item.sh` avvisar HTTP-URL (kräver HTTPS)
-- [ ] `add-item.sh` avvisar sök-URL:er (google.com, bing.com, etc.)
-- [ ] `add-item.sh` avvisar ogiltigt prisformat (t.ex. "around $30")
-- [ ] `add-item.sh` avvisar ogiltig sektion (inte i whitelist)
-- [ ] `add-item.sh` avvisar ogiltigt storleksformat (t.ex. "62" utan "Från")
-- [ ] `add-item.sh` kräver --brand (inte längre valfritt)
-- [ ] `add-item.sh` avvisar för kort/långt namn
-- [ ] `add-item.sh sections` listar alla giltiga sektioner
-- [ ] Befintlig bildvalidering (magic bytes) fungerar fortfarande
+- [x] `add-item.sh` avvisar HTTP-URL (kräver HTTPS)
+- [x] `add-item.sh` avvisar sök-URL:er (google.com, bing.com, etc.)
+- [x] `add-item.sh` avvisar ogiltigt prisformat (t.ex. "around $30")
+- [x] `add-item.sh` avvisar ogiltig sektion (inte i whitelist)
+- [x] `add-item.sh` avvisar ogiltigt storleksformat (t.ex. "62" utan "Från")
+- [x] `add-item.sh` kräver --brand (inte längre valfritt)
+- [x] `add-item.sh` avvisar för kort/långt namn
+- [x] `add-item.sh sections` listar alla giltiga sektioner
+- [x] Befintlig bildvalidering (magic bytes) fungerar fortfarande (oförändrad)
 
-### Permissions (steg 2)
+### Permissions (steg 2) ✅ (verifierat 2026-03-17 via test-auto-discovery.sh + agentlogg)
 
-- [ ] Agenten kan köra `add-item.sh add`, `exists`, `count`, `list`, `sections`
-- [ ] Agenten kan INTE köra `add-item.sh remove`
-- [ ] Agenten kan INTE läsa/skriva/redigera filer direkt
-- [ ] Agenten kan INTE köra andra bash-kommandon
+- [x] Agenten kan köra `add-item.sh add`, `exists`, `count`, `list`, `sections`
+- [x] Agenten kan INTE köra `add-item.sh remove` (blockeras av permissions)
+- [x] Agenten kan INTE läsa/skriva/redigera filer direkt (read/edit deny)
+- [x] Agenten kan INTE köra andra bash-kommandon (bash * deny)
 
-### Orkestrering (steg 4)
+### Orkestrering (steg 4) ✅ (verifierat 2026-03-17)
 
-- [ ] `orchestrate.sh --dry-run` visar plan utan att köra
-- [ ] `orchestrate.sh --single 0 --no-push` kör en agent och committar lokalt
+- [x] `orchestrate.sh --dry-run` visar plan utan att köra
+- [x] `orchestrate.sh --single 0 --no-push` kör en agent och committar lokalt
 - [ ] `orchestrate.sh` kör alla 5 agenter utan krasch
 - [ ] Git commit och push fungerar automatiskt
-- [ ] Loggar skrivs till `logs/`
+- [x] Loggar skrivs till `logs/`
 
-### End-to-end
+### End-to-end (delvis verifierat 2026-03-17)
 
-- [ ] Agent hittar minst 1 ny produkt vid testkörning
-- [ ] Produkten passerar all validering i add-item.sh
+- [x] Agent hittar minst 1 ny produkt vid testkörning (3 produkter, single agent)
+- [x] Produkten passerar all validering i add-item.sh
 - [ ] Sidan renderar korrekt med nya produkter (browser-test)
 - [ ] Sajten uppdateras på GitHub Pages
 - [ ] launchd-jobb laddas och visas i `launchctl list`
-- [ ] Gratis modell fungerar tillräckligt bra för att hitta och verifiera produkter
+- [x] Gratis modell fungerar tillräckligt bra (nemotron-3-super-free, websearch + add OK)
+
+### Buggar hittade och fixade under testning
+
+| Bugg | Orsak | Fix |
+|---|---|---|
+| `flock: command not found` | macOS har inte `flock` (Linux-kommando) | Ersatt med `mkdir`-baserat lås (atomärt, cross-platform) |
+| `timeout: command not found` | macOS har inte `timeout` (GNU coreutils) | Fallback till `gtimeout` eller körning utan timeout |
+| OpenCode `-q` flag | OpenCode har ingen `-q` flagga | Borttagen ur alla anrop |
+| `opencode.json` ogiltigt | `write`, `websearch`, `webfetch` hade objekt-format istället för strängar | Fixat till korrekt schema (strängar för enkla verktyg) |
+| `$44.99` i dubbla citattecken | Shell expanderade `$44` till tom sträng | Agenten löste det själv med enkla citattecken vid retry |
