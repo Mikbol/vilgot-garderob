@@ -1083,3 +1083,7 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 | OpenCode `-q` flag | OpenCode har ingen `-q` flagga | Borttagen ur alla anrop |
 | `opencode.json` ogiltigt | `write`, `websearch`, `webfetch` hade objekt-format istället för strängar | Fixat till korrekt schema (strängar för enkla verktyg) |
 | `$44.99` i dubbla citattecken | Shell expanderade `$44` till tom sträng | Agenten löste det själv med enkla citattecken vid retry |
+| `timeout` saknas på macOS | Varken `timeout` eller `gtimeout` installerade | Bytt till `dg_timeout` som primär (finns i `~/.local/bin/`), `timeout` som fallback i sandbox/Linux |
+| Timeout-detektion felaktig | `dg_timeout` returnerar exit 0 (inte 124 som GNU timeout) | Detekterar timeout via `duration >= TIMEOUT_SECS` som komplement till exit 124 |
+| Föräldralösa bilder vid avbruten körning | Agenten laddar ned bild innan add-item.sh körs; om add misslyckas blir bilden kvar | Manuell städning: `git status --short \| grep '^?? img/' \| awk '{print $2}' \| xargs rm -f` |
+| `mktemp` kollision | `/tmp/vg-product-XXXXXX.json` fanns kvar från förra körningen | add-item.sh bör använda unika tempfiler; workaround: rensa `/tmp/vg-product-*` |
