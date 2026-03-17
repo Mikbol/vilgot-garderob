@@ -146,7 +146,57 @@ Pass: `PASS: 0 samlingslänkar`. Fail: lista med kvarvarande samlingslänkar.
 
 WebFetch mot live-sajten: kontrollera att antal matchar `./add-item.sh count` och att "Baby Boy Jumpsuit in Jersey" inte finns.
 
-**Om Chrome inte är anslutet:** Steg 7b och 7c kan INTE hoppas över. De verifierar att ändringarna faktiskt syns för användaren. Vänta tills Chrome är anslutet, eller be Mikael ansluta det. Markera verifieringen som INTE GENOMFÖRD tills dess.
+**7e. Fullständig sajt-verifiering (Chrome JavaScript, OBLIGATORISKT):**
+
+Verifierar HELA sajten, inte bara de ändrade produkterna. Scrolla hela sidan (dubbelt, upp och ned) för att trigga all lazy loading, vänta 2s, sedan:
+
+```javascript
+async function fullVerify() {
+  for (let y = 0; y < document.body.scrollHeight; y += 300) {
+    window.scrollTo(0, y); await new Promise(r => setTimeout(r, 80));
+  }
+  await new Promise(r => setTimeout(r, 2000));
+  for (let y = document.body.scrollHeight; y >= 0; y -= 300) {
+    window.scrollTo(0, y); await new Promise(r => setTimeout(r, 80));
+  }
+  await new Promise(r => setTimeout(r, 1000));
+
+  const imgs = document.querySelectorAll('img');
+  const broken = [];
+  imgs.forEach(img => {
+    if (!(img.complete && img.naturalWidth > 0)) {
+      let name = '';
+      for (let el = img; el; el = el.parentElement) {
+        const h3 = el.querySelector('h3');
+        if (h3) { name = h3.textContent; break; }
+      }
+      broken.push({ name: name || img.alt, src: img.src });
+    }
+  });
+
+  const buyLinks = Array.from(document.querySelectorAll('a')).filter(a => a.textContent.includes('Köp'));
+  const badLinks = buyLinks.map(a => {
+    let el = a, name = '';
+    for (let i = 0; i < 5; i++) { el = el.parentElement; if (!el) break; const h3 = el.querySelector('h3'); if (h3) { name = h3.textContent; break; } }
+    const url = a.href;
+    const bad = (url.includes('/collections') && !url.includes('/products/')) || (url.includes('/market/') && !url.includes('etsy.com/market/'));
+    return bad ? { name, url } : null;
+  }).filter(Boolean);
+
+  const sections = Array.from(document.querySelectorAll('h2')).map(h => h.textContent.trim()).filter(t => t.length > 0);
+
+  return JSON.stringify({
+    images: { total: imgs.length, loaded: imgs.length - broken.length, broken: broken.length, brokenList: broken },
+    links: { total: buyLinks.length, bad: badLinks.length, badList: badLinks },
+    sections: sections.length
+  });
+}
+fullVerify();
+```
+
+Pass: 0 trasiga bilder, 0 felaktiga köp-länkar, 15 sektioner, antal köp-länkar = `./add-item.sh count`.
+
+**Om Chrome inte är anslutet:** Vänta tills det är anslutet. Denna verifiering kan INTE hoppas över eller ersättas med curl/WebFetch. Markera som INTE GENOMFÖRD tills Chrome körts.
 
 **Tid:** 5 min.
 
@@ -188,3 +238,4 @@ Alla steg genomförda och verifierade.
 | 7b. Chrome pixelcheck lilax-tux-grey.jpg | PASS: complete=true, 2000x3000, screenshot visar grå tuxedo footie |
 | 7c. Chrome DOM href samlingslänkar | PASS: 0 samlingslänkar (exkl. 2 Etsy, medvetet behållna) |
 | 7d. WebFetch antal produkter | PASS: 75 produkter, jumpsuit borta |
+| 7e. Fullständig sajt-verifiering | PASS: 67/67 bilder renderar, 75/75 köp-länkar OK, 15/15 sektioner, 0 samlingslänkar |

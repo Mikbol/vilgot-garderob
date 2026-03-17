@@ -836,24 +836,30 @@ async function verifyAll() {
 verifyAll();
 ```
 
-Om Chrome-extension INTE är ansluten: notera att visuell verifiering inte gjordes och dokumentera att det är en LUCKA.
+Om Chrome-extension INTE är ansluten: vänta tills den är ansluten. Denna verifiering kan INTE hoppas över.
 
 **Metod 3: Bildverifiering via curl (obligatorisk om produkter lades till)**
 
 ```bash
 # För varje ny bild, verifiera HTTP 200 från live-sajten
-# Byt FILNAMN till faktiska filnamn från img/
-curl -sL -o /dev/null -w 'HTTP %{http_code}: FILNAMN\n' "https://mikbol.github.io/vilgot-garderob/img/FILNAMN"
+git diff HEAD~1 --name-only -- img/ | while read f; do
+  curl -sL -o /dev/null -w "HTTP %{http_code}: $f\n" "https://mikbol.github.io/vilgot-garderob/$f"
+done
 ```
 
+**Metod 4: Fullständig sajt-verifiering (Chrome JavaScript, OBLIGATORISK vid varje körning)**
+
+Verifierar HELA sajten (alla produkter, alla bilder, alla länkar), inte bara de ändrade. Kör fullVerify()-funktionen (se PLAN-fix-site-issues.md steg 7e för exakt kod).
+
+Pass: 0 trasiga bilder, 0 felaktiga köp-länkar (exkl. 2 Etsy), sektioner = 15, köp-länkar = `./add-item.sh count`.
+
 **Pass (ALLA dessa ska vara sanna):**
-- Antal produkter matchar `./add-item.sh count` exakt
-- Eventuella nya produkter syns med rätt namn och pris (WebFetch)
+- Antal produkter matchar `./add-item.sh count` exakt (WebFetch)
+- ALLA bilder renderar (complete && naturalWidth > 0, Chrome fullVerify)
+- ALLA köp-länkar pekar på produktsidor (Chrome fullVerify)
 - Alla sektioner renderas (15 st)
-- Alla nya bilder laddas (complete && naturalWidth > 0 i Chrome JS)
-- Alla nya bilder returnerar HTTP 200 via curl
-- Nya produkters köp-länkar pekar på produktsidor, INTE samlingssidor
-- Screenshot av varje ny produkt visar en faktisk produktbild (inte placeholder, inte trasig ikon, inte fel produkt)
+- Nya bilder returnerar HTTP 200 via curl
+- Screenshot av varje ny produkt visar en faktisk produktbild
 
 **Fail:** Något av ovanstående stämmer inte. Felsök, fixa, push igen, verifiera igen.
 
