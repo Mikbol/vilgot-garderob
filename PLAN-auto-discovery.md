@@ -85,6 +85,9 @@ Om agenten hallucerar, skickar skräp, eller försöker köra oväntade kommando
 - [x] Härdning av add-item.sh: URL, pris, sektion, storlek, namn, brand, bild-URL (8/8 tester OK)
 - [x] Modellval: research och beslut (OpenCode Zen gratis modell, Copilot/Ollama som fallback)
 - [x] Testskript: `test-auto-discovery.sh` (validering + OpenCode + pipeline)
+- [x] Diagnostik: `diagnose-run.sh` (logganalys: websearch, fel, mktemp, dollar-pris, permissions)
+- [x] Timeout: `dg_timeout` som primär, `timeout` som fallback (Linux/sandbox)
+- [x] mktemp-fix: 8 X:ar istället för 6, inget .json-suffix
 
 ## Filer
 
@@ -94,7 +97,8 @@ vilgot-kläder/site/
 ├── opencode.json              # KLAR: permissions, modell, agent
 ├── agents/
 │   └── product-scout.md       # KLAR: agent-definition
-├── orchestrate.sh             # KLAR: huvudskript (dry-run testad)
+├── orchestrate.sh             # KLAR: huvudskript (dry-run testad, dg_timeout)
+├── diagnose-run.sh            # KLAR: logganalys efter körning
 ├── logs/                      # KLAR: gitignored
 └── .gitignore                 # KLAR
 ```
@@ -731,27 +735,30 @@ AFTER=$(./add-item.sh count)
 echo "Före: $BEFORE, Efter: $AFTER, Nya: $((AFTER - BEFORE))"
 ```
 
-**Kontrollera loggen efteråt:**
+**Kör diagnos direkt efter:**
 
 ```bash
-cat logs/*agent-0*.log | tail -40
+./diagnose-run.sh
 ```
 
+Skriptet analyserar alla agentloggar och rapporterar: websearch-anrop, webfetch-besök, duplikat, tillagda, fel, mktemp-kollisioner, dollar-pris-buggar, permission denied, föräldralösa bilder. Claude ska köra detta efter VARJE orchestrate-körning.
+
 **Pass (alla dessa ska vara sanna):**
-- Agenten använde websearch (loggen innehåller "Exa Web Search" eller "WebSearch")
-- Agenten öppnade minst en produktsida via webfetch (loggen innehåller "WebFetch https://")
-- Agenten kollade duplikat (`./add-item.sh exists`)
-- Agenten hämtade sektioner (`./add-item.sh sections`)
+- Agenten använde websearch (diagnosen visar ≥1 sökning)
+- Agenten öppnade minst en produktsida via webfetch (≥1 sidbesök)
 - Exit code 0 (ingen krasch, inget timeout)
+- 0 mktemp-kollisioner
+- 0 dollar-pris-buggar
 - Om produkter lades till: `./add-item.sh count` är högre än innan
 
-**Acceptabelt:** 0 nya produkter OM loggen visar att agenten faktiskt sökte och alla hittade produkter redan fanns eller bildnedladdning blockerades.
+**Acceptabelt:** 0 nya produkter OM diagnosen visar att agenten sökte och alla hittade produkter redan fanns (duplikat) eller bildnedladdning blockerades (HTTP 403).
 
 **Fail:**
 - Agenten kraschade (exit ≠ 0)
-- Agenten sökte inte alls (ingen websearch-rad i loggen)
-- Agenten försökte lägga till men fick ERROR som inte är rimligt
-- Timeout (agenten hann inte klart)
+- Agenten sökte inte alls (0 websearch i diagnosen)
+- mktemp-kollisioner (temp-filer blockerar)
+- Dollar-pris-buggar (agenten använder dubbla citattecken för $-priser)
+- Timeout utan att ha hittat något
 
 ### 7.3 Pusha och verifiera live-sajt
 
@@ -877,11 +884,11 @@ Tar 5-25 minuter (5 agenter × 1-5 min/agent).
 **Kontrollera efteråt:**
 
 ```bash
+# Diagnos (OBLIGATORISKT)
+./diagnose-run.sh
+
 # Se commits
 git log --oneline -5
-
-# Läs loggar för alla agenter
-for f in logs/*agent-*.log; do echo "=== $(basename $f) ==="; tail -5 "$f"; echo; done
 ```
 
 **Verifiera live-sajten igen** (samma procedur som 7.3: gh api status, WebFetch, curl för bilder).

@@ -231,7 +231,7 @@ cmd_add() {
     if [ "$no_image" = false ] && [ -n "$image_url" ]; then
         # Download to temp first
         local tmpfile
-        tmpfile=$(mktemp /tmp/vg-img-XXXXXX)
+        tmpfile=$(mktemp /tmp/vg-img-XXXXXXXX)
 
         info "Downloading image..."
         download_image "$image_url" "$tmpfile"
@@ -296,7 +296,7 @@ print(json.dumps(p, ensure_ascii=False))
 
     # Write product to temp file and inject
     local tmp_product
-    tmp_product=$(mktemp /tmp/vg-product-XXXXXX.json)
+    tmp_product=$(mktemp /tmp/vg-product-XXXXXXXX)
     echo "$product_json" > "$tmp_product"
 
     local result
