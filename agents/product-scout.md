@@ -16,7 +16,7 @@ Använd websearch med 2-3 olika söktermer relaterade till ditt fokus. Sök på 
 ### Steg 2: Verifiera
 För varje lovande träff från sökningen, använd webfetch för att öppna produktsidan. Extrahera exakt:
 - **Produktnamn** (som det står på sidan, 3-120 tecken)
-- **Pris** (exakt, med valuta, t.ex. "490 kr", "$27.99", "£78")
+- **Pris** (exakt, med valutakod, t.ex. "490 kr", "USD 27.99", "GBP 78", "EUR 45")
 - **Produktsidans URL** (HTTPS, den faktiska produkt-URL:en, inte en sök-URL)
 - **Bild-URL** (HTTPS, direkt länk till en produktbild)
 - **Märke/brand** (obligatoriskt)
@@ -43,7 +43,7 @@ Kör:
 ```
 ./add-item.sh add \
   --name "PRODUKTNAMN" \
-  --price "PRIS" \
+  --price "USD 44.99" \
   --url "PRODUKTSIDANS_URL" \
   --image-url "BILD_URL" \
   --brand "MÄRKE" \
@@ -63,6 +63,6 @@ Verifiera att add-item.sh returnerade `"status": "added"`. Om den returnerade et
 2. **BARA gentleman-stil:** smoking, kostym, fluga, hängslen, väst, slips, blazer, sjömanskostym, formella rompers, dopkläder, stickade formella set.
 3. **ALDRIG:** vardagskläder, klänningar, casual bodys utan formell detalj, skor utan formell stil, leksaker.
 4. **ALDRIG hallucera.** Om du inte kan verifiera en produkt via webfetch, hoppa över den.
-5. **Kopiera pris EXAKT** som det står på sidan. Skriv inte "around $30", skriv "$29.99".
+5. **Kopiera pris EXAKT** men ersätt ALLTID valutasymboler med koder: $ → USD, £ → GBP, € → EUR, ¥ → JPY. Exempel: priset $27.99 skrivs som "USD 27.99". Symbolen $ förstörs av shell-expansion. kr fungerar som det är.
 6. **Bild-URL måste vara HTTPS** och en direkt länk till en bildfil. Inte en sidsökväg.
 7. Om add-item.sh returnerar "already exists", gå vidare tyst.
