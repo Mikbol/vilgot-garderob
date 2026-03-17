@@ -14,9 +14,11 @@ SITE_DIR="$(cd "$(dirname "$0")" && pwd)"
 OFFLINE=false
 [[ "${1:-}" == "--offline" ]] && OFFLINE=true
 
-# macOS saknar timeout (GNU coreutils). Använd gtimeout eller fallback utan timeout.
+# Timeout-kommando: dg_timeout (DeGaming), timeout (Linux/coreutils), gtimeout (brew coreutils)
 TIMEOUT_CMD=""
-if command -v timeout >/dev/null 2>&1; then
+if command -v dg_timeout >/dev/null 2>&1; then
+    TIMEOUT_CMD="dg_timeout"
+elif command -v timeout >/dev/null 2>&1; then
     TIMEOUT_CMD="timeout"
 elif command -v gtimeout >/dev/null 2>&1; then
     TIMEOUT_CMD="gtimeout"

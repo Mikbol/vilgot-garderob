@@ -12,9 +12,11 @@ set -euo pipefail
 
 SITE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# macOS saknar timeout (GNU coreutils). Använd gtimeout eller fallback.
+# Timeout-kommando: dg_timeout (DeGaming), timeout (Linux/coreutils), gtimeout (brew coreutils)
 TIMEOUT_BIN=""
-if command -v timeout >/dev/null 2>&1; then
+if command -v dg_timeout >/dev/null 2>&1; then
+    TIMEOUT_BIN="dg_timeout"
+elif command -v timeout >/dev/null 2>&1; then
     TIMEOUT_BIN="timeout"
 elif command -v gtimeout >/dev/null 2>&1; then
     TIMEOUT_BIN="gtimeout"
@@ -111,8 +113,9 @@ Ditt sökfokus för denna körning: $full_focus"
   local end_time=$(date +%s)
   local duration=$((end_time - start_time))
 
-  if [ "$exit_code" -eq 124 ]; then
-    echo "[$(date '+%H:%M:%S')] Agent $idx TIMEOUT after ${TIMEOUT_SECS}s" | tee -a "$log_file"
+  # Timeout-detektion: exit 124 (GNU timeout) eller duration >= TIMEOUT_SECS (dg_timeout returnerar 0)
+  if [ "$exit_code" -eq 124 ] || ([ -n "$TIMEOUT_BIN" ] && [ "$duration" -ge "$TIMEOUT_SECS" ]); then
+    echo "[$(date '+%H:%M:%S')] Agent $idx TIMEOUT after ${duration}s" | tee -a "$log_file"
   elif [ "$exit_code" -ne 0 ]; then
     echo "[$(date '+%H:%M:%S')] Agent $idx FAILED (exit $exit_code) after ${duration}s" | tee -a "$log_file"
   else
