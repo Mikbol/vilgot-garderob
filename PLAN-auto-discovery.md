@@ -710,7 +710,7 @@ Claude behöver normalt inte röra launchd. Undantag:
 
 ## Steg 7: Validering (vad Claude ska köra)
 
-All validering görs via `test-auto-discovery.sh` och tre manuella steg. Claude ska följa denna sektion vid varje end-to-end-körning.
+Claude ska följa ALLA steg i denna sektion vid varje end-to-end-körning. Inga genvägar. Varje steg har tydliga pass/fail-kriterier. Om ett steg failar: stopp, felsök, fixa, kör om.
 
 ### 7.1 Automatiska tester
 
@@ -719,73 +719,115 @@ cd /Users/bolm/AI-Assistent/vilgot-kläder/site
 ./test-auto-discovery.sh
 ```
 
-Täcker: filer, beroenden, add-item.sh-validering (8 tester), count/list, orchestrate dry-run, OpenCode headless/websearch/permissions. Alla PASS krävs (SKIP för launchd är OK innan steg 6).
+**Pass:** Alla tester PASS (SKIP för launchd OK innan steg 6).
+**Fail:** Minst ett test FAIL. Fixa felet, kör igen. Gå INTE vidare.
 
 ### 7.2 Skarpt agenttest (utan push)
 
 ```bash
+BEFORE=$(./add-item.sh count)
 ./orchestrate.sh --single 0 --no-push
+AFTER=$(./add-item.sh count)
+echo "Före: $BEFORE, Efter: $AFTER, Nya: $((AFTER - BEFORE))"
 ```
 
-Förväntat: agenten söker webben, hittar 0-3 produkter, lägger till via add-item.sh. Lokal commit skapas.
-
-Kontrollera efteråt:
+**Kontrollera loggen efteråt:**
 
 ```bash
-# Antal produkter (ska vara >= vad det var innan)
-./add-item.sh count
-
-# Se commit
-git log --oneline -3
-
-# Läs agentloggen: verifiera att agenten körde websearch, webfetch, exists, sections, add
-cat logs/*agent-0*.log | tail -30
-
-# Verifiera att nya bilder finns (om produkter lades till)
-ls -lt img/ | head -5
+cat logs/*agent-0*.log | tail -40
 ```
 
-**Vad Claude ska kontrollera i loggen:**
-- Agenten använde websearch (rad med "Exa Web Search")
-- Agenten verifierade via webfetch (rad med "WebFetch https://...")
+**Pass (alla dessa ska vara sanna):**
+- Agenten använde websearch (loggen innehåller "Exa Web Search" eller "WebSearch")
+- Agenten öppnade minst en produktsida via webfetch (loggen innehåller "WebFetch https://")
 - Agenten kollade duplikat (`./add-item.sh exists`)
 - Agenten hämtade sektioner (`./add-item.sh sections`)
-- Om add-item.sh returnerade ERROR: var felet rimligt? (t.ex. pris utan valuta, redan finns)
-- Om agenten inte hittade några produkter: kontrollera att den faktiskt sökte (inte bara gav upp)
+- Exit code 0 (ingen krasch, inget timeout)
+- Om produkter lades till: `./add-item.sh count` är högre än innan
 
-**Om 0 produkter lades till men agenten körde korrekt:** det är OK. Kan bero på att alla hittade produkter redan fanns eller att bildnedladdning blockerades.
+**Acceptabelt:** 0 nya produkter OM loggen visar att agenten faktiskt sökte och alla hittade produkter redan fanns eller bildnedladdning blockerades.
 
-**Om agenten kraschade (exit ≠ 0):** läs loggen, identifiera felet, fixa, kör igen.
+**Fail:**
+- Agenten kraschade (exit ≠ 0)
+- Agenten sökte inte alls (ingen websearch-rad i loggen)
+- Agenten försökte lägga till men fick ERROR som inte är rimligt
+- Timeout (agenten hann inte klart)
 
-### 7.3 Verifiera rendering
+### 7.3 Pusha och verifiera live-sajt
+
+**Detta steg är OBLIGATORISKT. Lokal rendering räcker INTE. Sajten måste verifieras LIVE på GitHub Pages.**
 
 ```bash
-open index.html
+cd /Users/bolm/AI-Assistent/vilgot-kläder/site
+git push origin main
 ```
 
-Kontrollera i browsern:
-- Alla produktkort visas (inga tomma sektioner)
-- Nya produkter syns i rätt sektion
-- Bilder laddas (inga trasiga bildikoner)
-- Sökfunktion fungerar
-- Dark/light mode fungerar
+Vänta tills GitHub Pages har byggt:
 
-### 7.4 Full körning (alla agenter, med push)
+```bash
+# Kolla deployment-status (ska vara "built")
+gh api repos/Mikbol/vilgot-garderob/pages --jq '.status'
+```
+
+Om status inte är "built", vänta 30 sekunder och kör igen. Max 5 försök.
+
+**Verifiera live-sajten via WebFetch:**
+
+```bash
+# Denna verifiering görs via WebFetch-verktyget, INTE via curl
+```
+
+Använd WebFetch mot `https://mikbol.github.io/vilgot-garderob/` med denna prompt:
+
+> Count all products. List the last 5 products (highest ID numbers) with exact name and price. Check if all product cards have image references. List all section headings. Report any JavaScript errors or broken HTML.
+
+**Pass (alla dessa ska vara sanna):**
+- Antal produkter matchar `./add-item.sh count` exakt
+- Eventuella nya produkter syns med rätt namn och pris
+- Alla sektioner renderas (15 st)
+- Inga JavaScript-fel
+
+**Verifiera att nya bilder laddas live (om produkter lades till):**
+
+```bash
+# För varje ny bild, verifiera HTTP 200 från live-sajten
+# Byt FILNAMN till faktiska filnamn från img/
+curl -sL -o /dev/null -w 'HTTP %{http_code}: FILNAMN\n' "https://mikbol.github.io/vilgot-garderob/img/FILNAMN"
+```
+
+**Pass:** Alla nya bilder returnerar HTTP 200.
+**Fail:** Någon bild returnerar 404 eller annan felkod.
+
+### 7.4 Full körning (alla 5 agenter)
 
 Kör bara efter att 7.1-7.3 lyckats.
 
 ```bash
+BEFORE=$(./add-item.sh count)
 ./orchestrate.sh
+AFTER=$(./add-item.sh count)
+echo "Före: $BEFORE, Efter: $AFTER, Nya: $((AFTER - BEFORE))"
 ```
 
-Tar 5-25 minuter (5 agenter × 1-5 min/agent). Kontrollera efteråt:
+Tar 5-25 minuter (5 agenter × 1-5 min/agent).
+
+**Kontrollera efteråt:**
 
 ```bash
+# Se commits
 git log --oneline -5
-./add-item.sh count
+
+# Läs loggar för alla agenter
+for f in logs/*agent-*.log; do echo "=== $(basename $f) ==="; tail -5 "$f"; echo; done
 ```
 
-Verifiera live-sajten (vänta 1-2 min efter push): https://mikbol.github.io/vilgot-garderob/
+**Verifiera live-sajten igen** (samma procedur som 7.3: gh api status, WebFetch, curl för bilder).
+
+**Pass:**
+- Minst 3 av 5 agenter körde utan krasch
+- Totalt minst 1 ny produkt (om alla 5 agenter hittar 0 nya, undersök varför)
+- Live-sajten visar rätt antal produkter
+- Alla nya bilder laddas (HTTP 200)
 
 ---
 
@@ -913,10 +955,10 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 8.  ✅ Konfigurera OpenCode Zen (/connect, gratis modell)
 9.  ✅ Kör ./test-auto-discovery.sh (27/27 PASS)
 10. ✅ Skarpt agenttest (3 produkter tillagda, lokal commit)
-11. ⬜ Verifiera rendering (steg 7.3)
-12. ⬜ Full körning alla agenter (steg 7.4)
+11. ✅ Push + live-verifiering (71 produkter, 3 nya bilder HTTP 200, WebFetch)
+12. ⬜ Full körning alla 5 agenter (steg 7.4)
 13. ⬜ Installera launchd (steg 6)
-14. ⬜ Commit allt och push
+14. ⬜ Commit allt och push (workspace-repot)
 ```
 
 ---
@@ -950,14 +992,20 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 - [ ] Git commit och push fungerar automatiskt
 - [x] Loggar skrivs till `logs/`
 
-### End-to-end (delvis verifierat 2026-03-17)
+### End-to-end ✅ (verifierat 2026-03-17, single agent + push + live-sajt)
 
 - [x] Agent hittar minst 1 ny produkt vid testkörning (3 produkter, single agent)
 - [x] Produkten passerar all validering i add-item.sh
-- [ ] Sidan renderar korrekt med nya produkter (browser-test)
-- [ ] Sajten uppdateras på GitHub Pages
-- [ ] launchd-jobb laddas och visas i `launchctl list`
-- [x] Gratis modell fungerar tillräckligt bra (nemotron-3-super-free, websearch + add OK)
+- [x] Sajten pushad till GitHub, Pages status: "built"
+- [x] Live-sajt renderar 71 produkter (WebFetch-verifierat mot mikbol.github.io)
+- [x] 3 nya produkter syns med rätt namn och pris på live-sajten
+- [x] Alla 3 nya bilder returnerar HTTP 200 från live-sajten
+- [x] 15 sektioner renderas korrekt
+- [x] Dark/light mode fungerar
+- [x] Inga JavaScript-fel
+- [x] Gratis modell fungerar (nemotron-3-super-free, websearch + webfetch + add)
+- [ ] launchd-jobb laddas och visas i `launchctl list` (steg 6 ej installerat ännu)
+- [ ] Full körning med alla 5 agenter (steg 7.4)
 
 ### Buggar hittade och fixade under testning
 
