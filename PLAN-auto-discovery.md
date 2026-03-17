@@ -613,12 +613,10 @@ launchd är macOS inbyggda schemaläggare (motsvarar cron på Linux, men bättre
     <string>/Users/bolm/AI-Assistent/vilgot-kläder/site/orchestrate.sh</string>
     <key>StartCalendarInterval</key>
     <dict>
-        <key>Weekday</key>
-        <integer>0</integer>
         <key>Hour</key>
-        <integer>10</integer>
+        <integer>5</integer>
         <key>Minute</key>
-        <integer>0</integer>
+        <integer>45</integer>
     </dict>
     <key>StandardOutPath</key>
     <string>/tmp/vilgot-discovery.log</string>
@@ -627,7 +625,9 @@ launchd är macOS inbyggda schemaläggare (motsvarar cron på Linux, men bättre
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
-        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:/Users/bolm/.local/bin</string>
+        <key>HOME</key>
+        <string>/Users/bolm</string>
         <key>OPENCODE_ENABLE_EXA</key>
         <string>true</string>
     </dict>
@@ -1027,7 +1027,7 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 10. ✅ Skarpt agenttest (3 produkter tillagda, lokal commit)
 11. ✅ Push + live-verifiering (71 produkter, 3 nya bilder HTTP 200, WebFetch)
 12. ✅ Full körning alla 5 agenter (+5 produkter, 76 totalt, alla buggar fixade)
-13. ⬜ Installera launchd (steg 6)
+13. ✅ Installera launchd (dagligen kl 05:45)
 14. ⬜ Commit allt och push (workspace-repot)
 ```
 
@@ -1078,7 +1078,7 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 - [x] Dark/light mode fungerar (Chrome find: "Byt tema"-knapp finns)
 - [x] Inga JavaScript-fel
 - [x] Gratis modell fungerar (nemotron-3-super-free, websearch + webfetch + add)
-- [ ] launchd-jobb laddas och visas i `launchctl list` (steg 6 ej installerat ännu)
+- [x] launchd-jobb laddat (dagligen kl 05:45, `launchctl list | grep vilgot` visar jobbet)
 - [x] Full körning med alla 5 agenter (5 nya produkter, 76 totalt, 0 buggar, WebFetch + curl verifierat, Chrome ej ansluten)
 
 ### Buggar hittade och fixade under testning

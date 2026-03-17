@@ -316,7 +316,7 @@ Körningen genomförd enligt plan. Alla steg passerade.
 | 7. Push + Pages | ✅ Pushat, Pages status "built" |
 | 8. Live-verifiering | ✅ WebFetch: 76 produkter. curl: 5 nya bilder HTTP 200. Chrome: ej ansluten (noterat som lucka). |
 | 9. Dokument | ✅ PLAN-auto-discovery.md + STATUS.md uppdaterade |
-| 10. launchd | ⬜ Väntar på Mikaels OK |
+| 10. launchd | ✅ Installerad, dagligen kl 05:45 |
 
 ### Nya produkter tillagda
 
