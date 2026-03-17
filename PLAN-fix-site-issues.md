@@ -90,21 +90,15 @@ git push origin main
 
 ## Steg 7: Verifiera live-sajt
 
-Vänta på Pages build, sedan:
+Vänta på Pages build, sedan köra ALLA verifieringar. Ingen är valfri.
 
-**7a. curl alla ändrade URL:er:**
+**7a. Mål-URL:er finns (curl):**
 ```bash
-# Tiny Universe (7 st)
 for url in \
   "https://thetinyuniverse.com/products/the-tiny-tuxedo-classic-style" \
   "https://thetinyuniverse.com/products/the-tiny-tuxedo" \
   "https://thetinyuniverse.com/products/the-tiny-tuxedo-red-bow-tie" \
-  "https://thetinyuniverse.com/products/the-tiny-body-tuxedo"; do
-  curl -sL -o /dev/null -w "HTTP %{http_code}: $url\n" "$url"
-done
-
-# Jacadi (3 st)
-for url in \
+  "https://thetinyuniverse.com/products/the-tiny-body-tuxedo" \
   "https://www.jacadi.ie/products/baby-boy-linen-set-2045169-j0971" \
   "https://www.jacadi.ie/products/baby-boy-set-in-garter-stitch-2044438-j0152" \
   "https://www.jacadi.ie/products/baby-boy-trousers-set-2019508-j0198"; do
@@ -113,17 +107,48 @@ done
 ```
 Pass: alla HTTP 200 eller 301.
 
-**7b. Bildverifiering:**
-```bash
-curl -sL -o /dev/null -w "HTTP %{http_code}\n" "https://mikbol.github.io/vilgot-garderob/img/lilax-tux-grey.jpg"
+**7b. Fixad bild laddas som pixel (Chrome JavaScript, OBLIGATORISKT):**
+
+Navigera till live-sajten. Scrolla hela sidan för lazy load. Kör:
+```javascript
+const img = document.querySelector('img[src*="lilax-tux-grey"]');
+if (!img) { 'FAIL: bild inte i DOM' }
+else if (img.complete && img.naturalWidth > 0) {
+  `PASS: ${img.naturalWidth}x${img.naturalHeight}`
+} else { 'FAIL: bild finns i DOM men renderar inte' }
 ```
-Pass: HTTP 200.
+Pass: PASS med dimensioner > 0. Fail: allt annat.
 
-**7c. WebFetch:** Kontrollera att antal produkter matchar `./add-item.sh count` och att inga samlingslänkar finns bland de ändrade produkterna.
+**Ta screenshot** av produktkortet "Gentleman Tuxedo Footie" och bekräfta visuellt att bilden visar ett babyklädesplagg (inte trasig ikon, inte tom ruta).
 
-**7d. Chrome (om anslutet):** JavaScript: scrolla sidan, kolla `img.complete && img.naturalWidth > 0` för lilax-tux-grey.jpg. Screenshot av produktkortet.
+**7c. Köp-länkar på sajten pekar rätt (Chrome JavaScript, OBLIGATORISKT):**
 
-**Tid:** 3 min.
+HTTP 200 bevisar att mål-URL:en finns, men inte att köp-knappen på sajten pekar dit. Verifiera att de faktiska href-attributen i DOM matchar de nya URL:erna:
+
+```javascript
+const links = Array.from(document.querySelectorAll('a'));
+const buyLinks = links.filter(a => a.textContent.includes('Köp'));
+const stillBad = buyLinks.map(a => {
+  let el = a;
+  let name = '';
+  for (let i = 0; i < 5; i++) { el = el.parentElement; if (!el) break; const h3 = el.querySelector('h3'); if (h3) { name = h3.textContent; break; } }
+  const url = a.href;
+  const isCollection = (url.includes('/collections') && !url.includes('/products/')) || url.includes('/market/');
+  // Etsy-sök är OK (medvetet behållna)
+  const isEtsy = url.includes('etsy.com/market/');
+  return (isCollection && !isEtsy) ? { name, url } : null;
+}).filter(Boolean);
+stillBad.length === 0 ? 'PASS: 0 samlingslänkar (exkl. Etsy)' : JSON.stringify(stillBad);
+```
+Pass: `PASS: 0 samlingslänkar`. Fail: lista med kvarvarande samlingslänkar.
+
+**7d. Antal produkter (WebFetch):**
+
+WebFetch mot live-sajten: kontrollera att antal matchar `./add-item.sh count` och att "Baby Boy Jumpsuit in Jersey" inte finns.
+
+**Om Chrome inte är anslutet:** Steg 7b och 7c kan INTE hoppas över. De verifierar att ändringarna faktiskt syns för användaren. Vänta tills Chrome är anslutet, eller be Mikael ansluta det. Markera verifieringen som INTE GENOMFÖRD tills dess.
+
+**Tid:** 5 min.
 
 ## Steg 8: Uppdatera dokument
 
