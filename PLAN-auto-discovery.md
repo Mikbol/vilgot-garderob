@@ -779,19 +779,57 @@ Använd WebFetch mot `https://mikbol.github.io/vilgot-garderob/` med prompt:
 
 > Count all products. List the last 5 products (highest ID numbers) with exact name and price. Check if all product cards have image references. List all section headings. Report any JavaScript errors or broken HTML.
 
-**Metod 2: Chrome (visuell verifiering)**
+**Metod 2: Chrome (visuell + pixelverifiering, OBLIGATORISK)**
 
 Om Chrome-extension är ansluten (mcp__claude-in-chrome):
 
 ```
 1. Navigera till https://mikbol.github.io/vilgot-garderob/
-2. find: Sök efter varje ny produkts namn -> ska hittas
-3. find: "broken image or image error" -> ska ge 0 träffar
-4. find: "section headings for product categories" -> ska lista 15 sektioner
-5. find: "dark mode or light mode toggle" -> ska hitta "Byt tema"-knapp
+2. Scrolla igenom HELA sidan för att trigga lazy loading
+3. Kör JavaScript som kontrollerar VARJE bild med img.complete && img.naturalWidth > 0
+4. Kör JavaScript som hittar alla köp-länkar som pekar på /collections/ eller /market/ istället för /products/
+5. scroll_to varje ny produkt och ta screenshot för att VISUELLT bekräfta att bilden visar rätt plagg
 ```
 
-Om Chrome-extension INTE är ansluten: WebFetch-metoden räcker, men notera i loggen att visuell verifiering inte gjordes.
+JavaScript för bildverifiering (kör EFTER scroll genom hela sidan):
+
+```javascript
+// Scrolla hela sidan först
+async function verifyAll() {
+  for (let y = 0; y < document.body.scrollHeight; y += 500) {
+    window.scrollTo(0, y);
+    await new Promise(r => setTimeout(r, 100));
+  }
+  await new Promise(r => setTimeout(r, 1000));
+
+  // Kolla bilder
+  const imgs = document.querySelectorAll('img');
+  const broken = [];
+  imgs.forEach(img => {
+    if (!(img.complete && img.naturalWidth > 0)) {
+      const parent = img.closest('[class]');
+      const h3 = parent?.querySelector('h3');
+      broken.push({ name: h3?.textContent || img.alt, src: img.src });
+    }
+  });
+
+  // Kolla köp-länkar
+  const buyLinks = Array.from(document.querySelectorAll('a')).filter(a => a.textContent.includes('Köp'));
+  const badLinks = buyLinks.map(a => {
+    let el = a;
+    let name = '';
+    for (let i = 0; i < 5; i++) { el = el.parentElement; if (!el) break; const h3 = el.querySelector('h3'); if (h3) { name = h3.textContent; break; } }
+    const url = a.href;
+    const isCollection = (url.includes('/collections') && !url.includes('/products/')) || url.includes('/market/');
+    return isCollection ? { name, url } : null;
+  }).filter(Boolean);
+
+  return JSON.stringify({ brokenImages: broken, collectionLinks: badLinks }, null, 2);
+}
+verifyAll();
+```
+
+Om Chrome-extension INTE är ansluten: notera att visuell verifiering inte gjordes och dokumentera att det är en LUCKA.
 
 **Metod 3: Bildverifiering via curl (obligatorisk om produkter lades till)**
 
@@ -801,15 +839,27 @@ Om Chrome-extension INTE är ansluten: WebFetch-metoden räcker, men notera i lo
 curl -sL -o /dev/null -w 'HTTP %{http_code}: FILNAMN\n' "https://mikbol.github.io/vilgot-garderob/img/FILNAMN"
 ```
 
-**Pass (alla dessa ska vara sanna):**
+**Pass (ALLA dessa ska vara sanna):**
 - Antal produkter matchar `./add-item.sh count` exakt
-- Eventuella nya produkter syns med rätt namn och pris
+- Eventuella nya produkter syns med rätt namn och pris (WebFetch)
 - Alla sektioner renderas (15 st)
-- Inga trasiga bilder (0 broken images i Chrome find)
+- Alla nya bilder laddas (complete && naturalWidth > 0 i Chrome JS)
 - Alla nya bilder returnerar HTTP 200 via curl
-- Inga JavaScript-fel
+- Nya produkters köp-länkar pekar på produktsidor, INTE samlingssidor
+- Screenshot av varje ny produkt visar en faktisk produktbild (inte placeholder, inte trasig ikon, inte fel produkt)
 
 **Fail:** Något av ovanstående stämmer inte. Felsök, fixa, push igen, verifiera igen.
+
+### Kända pre-existing problem (inte orsakade av auto-discovery)
+
+Dessa fanns innan auto-discovery implementerades och berörs inte av den:
+
+| Problem | Antal | Detaljer |
+|---|---|---|
+| Trasig bild | 1 | `lilax-tux-grey.webp` (Gentleman Tuxedo Footie) |
+| Köp-länkar till samlingssidor | 13 | 7× The Tiny Universe → /collections/suits-tuxedos, 4× Jacadi → /collections/newborn-boy, 2× Etsy → /market/ |
+
+Dessa bör fixas separat men blockerar inte auto-discovery.
 
 ### 7.4 Full körning (alla 5 agenter)
 
@@ -1013,7 +1063,10 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 - [x] Live-sajt renderar 71 produkter (WebFetch-verifierat mot mikbol.github.io)
 - [x] 3 nya produkter syns med rätt namn och pris på live-sajten (WebFetch + Chrome find)
 - [x] Alla 3 nya bilder returnerar HTTP 200 från live-sajten (curl)
-- [x] 0 trasiga bilder (Chrome find: 65 bilder, alla laddas korrekt med alt-text)
+- [x] 0 trasiga bilder bland nya produkter (Chrome JS: complete && naturalWidth > 0 + screenshot)
+- [x] 0 samlingslänkar bland nya produkter (alla 3 pekar på produktsidor)
+- [ ] 1 pre-existing trasig bild: lilax-tux-grey.webp (inte auto-discovery)
+- [ ] 13 pre-existing samlingslänkar (inte auto-discovery)
 - [x] 15 sektioner renderas korrekt (Chrome find: 15 + huvudrubrik)
 - [x] Dark/light mode fungerar (Chrome find: "Byt tema"-knapp finns)
 - [x] Inga JavaScript-fel
