@@ -771,23 +771,29 @@ gh api repos/Mikbol/vilgot-garderob/pages --jq '.status'
 
 Om status inte är "built", vänta 30 sekunder och kör igen. Max 5 försök.
 
-**Verifiera live-sajten via WebFetch:**
+**Verifiera live-sajten (två metoder, kör BÅDA):**
 
-```bash
-# Denna verifiering görs via WebFetch-verktyget, INTE via curl
-```
+**Metod 1: WebFetch (dataverifiering)**
 
-Använd WebFetch mot `https://mikbol.github.io/vilgot-garderob/` med denna prompt:
+Använd WebFetch mot `https://mikbol.github.io/vilgot-garderob/` med prompt:
 
 > Count all products. List the last 5 products (highest ID numbers) with exact name and price. Check if all product cards have image references. List all section headings. Report any JavaScript errors or broken HTML.
 
-**Pass (alla dessa ska vara sanna):**
-- Antal produkter matchar `./add-item.sh count` exakt
-- Eventuella nya produkter syns med rätt namn och pris
-- Alla sektioner renderas (15 st)
-- Inga JavaScript-fel
+**Metod 2: Chrome (visuell verifiering)**
 
-**Verifiera att nya bilder laddas live (om produkter lades till):**
+Om Chrome-extension är ansluten (mcp__claude-in-chrome):
+
+```
+1. Navigera till https://mikbol.github.io/vilgot-garderob/
+2. find: Sök efter varje ny produkts namn -> ska hittas
+3. find: "broken image or image error" -> ska ge 0 träffar
+4. find: "section headings for product categories" -> ska lista 15 sektioner
+5. find: "dark mode or light mode toggle" -> ska hitta "Byt tema"-knapp
+```
+
+Om Chrome-extension INTE är ansluten: WebFetch-metoden räcker, men notera i loggen att visuell verifiering inte gjordes.
+
+**Metod 3: Bildverifiering via curl (obligatorisk om produkter lades till)**
 
 ```bash
 # För varje ny bild, verifiera HTTP 200 från live-sajten
@@ -795,8 +801,15 @@ Använd WebFetch mot `https://mikbol.github.io/vilgot-garderob/` med denna promp
 curl -sL -o /dev/null -w 'HTTP %{http_code}: FILNAMN\n' "https://mikbol.github.io/vilgot-garderob/img/FILNAMN"
 ```
 
-**Pass:** Alla nya bilder returnerar HTTP 200.
-**Fail:** Någon bild returnerar 404 eller annan felkod.
+**Pass (alla dessa ska vara sanna):**
+- Antal produkter matchar `./add-item.sh count` exakt
+- Eventuella nya produkter syns med rätt namn och pris
+- Alla sektioner renderas (15 st)
+- Inga trasiga bilder (0 broken images i Chrome find)
+- Alla nya bilder returnerar HTTP 200 via curl
+- Inga JavaScript-fel
+
+**Fail:** Något av ovanstående stämmer inte. Felsök, fixa, push igen, verifiera igen.
 
 ### 7.4 Full körning (alla 5 agenter)
 
@@ -992,16 +1005,17 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 - [ ] Git commit och push fungerar automatiskt
 - [x] Loggar skrivs till `logs/`
 
-### End-to-end ✅ (verifierat 2026-03-17, single agent + push + live-sajt)
+### End-to-end ✅ (verifierat 2026-03-17, single agent + push + live-sajt + Chrome)
 
 - [x] Agent hittar minst 1 ny produkt vid testkörning (3 produkter, single agent)
 - [x] Produkten passerar all validering i add-item.sh
 - [x] Sajten pushad till GitHub, Pages status: "built"
 - [x] Live-sajt renderar 71 produkter (WebFetch-verifierat mot mikbol.github.io)
-- [x] 3 nya produkter syns med rätt namn och pris på live-sajten
-- [x] Alla 3 nya bilder returnerar HTTP 200 från live-sajten
-- [x] 15 sektioner renderas korrekt
-- [x] Dark/light mode fungerar
+- [x] 3 nya produkter syns med rätt namn och pris på live-sajten (WebFetch + Chrome find)
+- [x] Alla 3 nya bilder returnerar HTTP 200 från live-sajten (curl)
+- [x] 0 trasiga bilder (Chrome find: 65 bilder, alla laddas korrekt med alt-text)
+- [x] 15 sektioner renderas korrekt (Chrome find: 15 + huvudrubrik)
+- [x] Dark/light mode fungerar (Chrome find: "Byt tema"-knapp finns)
 - [x] Inga JavaScript-fel
 - [x] Gratis modell fungerar (nemotron-3-super-free, websearch + webfetch + add)
 - [ ] launchd-jobb laddas och visas i `launchctl list` (steg 6 ej installerat ännu)
