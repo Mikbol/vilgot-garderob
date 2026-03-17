@@ -300,3 +300,34 @@ Föräldralösa bilder som redan pushats: `git rm img/FILNAMN && git commit && g
 | 9. Dokument | 2 min |
 | 10. launchd | 2 min |
 | **Total** | **20-32 min** |
+
+## Resultat (2026-03-17 19:13)
+
+Körningen genomförd enligt plan. Alla steg passerade.
+
+| Steg | Resultat |
+|------|----------|
+| 1. Dollar-pris-fix | ✅ Prompt ändrad, `USD 44.99` passerar validering |
+| 2. Test med OpenCode | ✅ `USD 29.99` gick igenom via OpenCode |
+| 3. Förutsättningar | ✅ Alla OK, 22/22 PASS offline |
+| 4. Kör 5 agenter | ✅ 5 nya produkter, 15 min, alla timeout 180s |
+| 5. Diagnostisera | ✅ 0 mktemp, 0 dollar-pris, alla websearch+webfetch, 1 fel (bild utan https, korrekt avvisad) |
+| 6. Städa bilder | ✅ 0 föräldralösa |
+| 7. Push + Pages | ✅ Pushat, Pages status "built" |
+| 8. Live-verifiering | ✅ WebFetch: 76 produkter. curl: 5 nya bilder HTTP 200. Chrome: ej ansluten (noterat som lucka). |
+| 9. Dokument | ✅ PLAN-auto-discovery.md + STATUS.md uppdaterade |
+| 10. launchd | ⬜ Väntar på Mikaels OK |
+
+### Nya produkter tillagda
+
+| Agent | Produkt | Pris | Brand |
+|-------|---------|------|-------|
+| 0 | Black Formal Tuxedo Set (3M-14Y) | 735.00 kr | Blessed Celebration |
+| 1 | Bowtie Suspender Baby Boy Outfit | 567.11 kr | Momorii |
+| 1 | Short Tuxedo Bow Tie Rompers | USD 425.00 | MIKI HOUSE Baby |
+| 2 | Nautical Knitted Sailor Set | 471.00 kr | Ryan and Remi |
+| 4 | Fendi Baby Boys Blue & White Ceremony Romper | 7255.00 kr | Fendi |
+
+### Luckor
+
+- Chrome var ej ansluten vid live-verifiering. Visuell pixelverifiering av nya bilder gjordes inte. WebFetch + curl bekräftar att data och bilder finns, men inte att bilderna visar rätt plagg.

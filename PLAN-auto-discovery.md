@@ -1026,7 +1026,7 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 9.  ✅ Kör ./test-auto-discovery.sh (27/27 PASS)
 10. ✅ Skarpt agenttest (3 produkter tillagda, lokal commit)
 11. ✅ Push + live-verifiering (71 produkter, 3 nya bilder HTTP 200, WebFetch)
-12. ⬜ Full körning alla 5 agenter (steg 7.4)
+12. ✅ Full körning alla 5 agenter (+5 produkter, 76 totalt, alla buggar fixade)
 13. ⬜ Installera launchd (steg 6)
 14. ⬜ Commit allt och push (workspace-repot)
 ```
@@ -1058,8 +1058,8 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 
 - [x] `orchestrate.sh --dry-run` visar plan utan att köra
 - [x] `orchestrate.sh --single 0 --no-push` kör en agent och committar lokalt
-- [ ] `orchestrate.sh` kör alla 5 agenter utan krasch
-- [ ] Git commit och push fungerar automatiskt
+- [x] `orchestrate.sh` kör alla 5 agenter (5 nya produkter, alla timeout 180s, 0 mktemp, 0 dollar-pris)
+- [x] Git commit och push fungerar automatiskt
 - [x] Loggar skrivs till `logs/`
 
 ### End-to-end ✅ (verifierat 2026-03-17, single agent + push + live-sajt + Chrome)
@@ -1079,7 +1079,7 @@ OpenCode Zen med gratis modell: $0/mån. Bildnedladdningsbandbredd försumbar. O
 - [x] Inga JavaScript-fel
 - [x] Gratis modell fungerar (nemotron-3-super-free, websearch + webfetch + add)
 - [ ] launchd-jobb laddas och visas i `launchctl list` (steg 6 ej installerat ännu)
-- [ ] Full körning med alla 5 agenter (steg 7.4)
+- [x] Full körning med alla 5 agenter (5 nya produkter, 76 totalt, 0 buggar, WebFetch + curl verifierat, Chrome ej ansluten)
 
 ### Buggar hittade och fixade under testning
 
