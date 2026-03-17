@@ -177,3 +177,14 @@ git push origin main
 | 7. Verifiera live | 3 min |
 | 8. Dokument | 1 min |
 | **Total** | **14 min** |
+
+## Resultat (2026-03-17)
+
+Alla steg genomförda och verifierade.
+
+| Verifiering | Resultat |
+|---|---|
+| 7a. curl mål-URL:er | PASS: alla 7 HTTP 200 |
+| 7b. Chrome pixelcheck lilax-tux-grey.jpg | PASS: complete=true, 2000x3000, screenshot visar grå tuxedo footie |
+| 7c. Chrome DOM href samlingslänkar | PASS: 0 samlingslänkar (exkl. 2 Etsy, medvetet behållna) |
+| 7d. WebFetch antal produkter | PASS: 75 produkter, jumpsuit borta |
