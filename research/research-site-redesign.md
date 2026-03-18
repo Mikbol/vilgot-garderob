@@ -287,7 +287,18 @@ Animationer och filter-UI kan inte bedömas via research. En PoC ska testa:
 - Mobil-responsivitet (375px viewport)
 
 PoC-filen: `poc/v1/index.html` (fristående, laddar GSAP från CDN, 5 hårdkodade produkter).
-Resultat avgör: vilka effekter som används, om GSAP behövs eller om anime.js/CSS räcker, om filter-pills ska bytas mot sökbar dropdown.
+
+### PoC-resultat (2026-03-18)
+
+PoC testad live i Chrome (desktop + 375px mobil). Alla 11 features fungerar. Se `poc/v1/RESULTAT.md` för detaljer.
+
+**Besvarade frågor:**
+- GSAP levererar wow-faktor (elastic bounce + stagger + konfetti). CSS-only räcker inte.
+- Filter-pills fungerar för storlek+pris. Brand behöver collapse/dropdown vid 36 brands.
+- localStorage URL-baserat fungerar korrekt.
+- Mobil 375px: filter collapsar, 2-kolumns grid, acceptabelt.
+
+**Kvarstående (inte testat i PoC):** Prestanda med 80 kort, storleksnormalisering med riktiga 20 format, filter+animation-interaktion.
 
 ## Evidensluckor
 
