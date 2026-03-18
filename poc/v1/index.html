@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoC: Sajt-redesign</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a1a; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+
+  /* Header */
+  header { text-align: center; padding: 2rem 1rem; }
+  header h1 { font-size: 2rem; color: #d4a84b; font-weight: 300; letter-spacing: 2px; }
+  header p { color: #888; margin-top: 0.5rem; font-style: italic; }
+
+  /* Filter bar */
+  .filter-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: #222; border-bottom: 1px solid #333;
+    padding: 0.75rem 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;
+    align-items: center;
+  }
+  .filter-group { display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
+  .filter-group label { color: #888; font-size: 0.75rem; text-transform: uppercase; margin-right: 0.25rem; }
+  .pill {
+    background: #333; color: #ccc; border: 1px solid #444; border-radius: 20px;
+    padding: 0.25rem 0.75rem; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+    user-select: none;
+  }
+  .pill:hover { background: #444; }
+  .pill.active { background: #d4a84b; color: #1a1a1a; border-color: #d4a84b; }
+  .filter-count { color: #888; font-size: 0.8rem; margin-left: auto; white-space: nowrap; }
+
+  /* Mobil: collapse filter */
+  .filter-toggle { display: none; background: #333; color: #d4a84b; border: 1px solid #d4a84b; border-radius: 20px; padding: 0.4rem 1rem; font-size: 0.85rem; cursor: pointer; }
+  @media (max-width: 768px) {
+    .filter-toggle { display: block; }
+    .filter-groups { display: none; flex-direction: column; width: 100%; }
+    .filter-groups.open { display: flex; }
+    .filter-bar { flex-direction: column; align-items: stretch; }
+    .filter-count { margin-left: 0; margin-top: 0.5rem; }
+  }
+
+  /* Produktgrid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; padding: 1.5rem; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 768px) { .grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; padding: 0.75rem; } }
+  @media (max-width: 400px) { .grid { grid-template-columns: 1fr; } }
+
+  /* Produktkort */
+  .card {
+    background: #252525; border-radius: 12px; overflow: hidden;
+    border: 1px solid #333; position: relative;
+  }
+  .card.hidden { display: none; }
+  .card-img {
+    width: 100%; aspect-ratio: 3/4; object-fit: cover; background: #f5f5f0;
+    display: block;
+  }
+  .card-body { padding: 1rem; }
+  .card-brand { color: #d4a84b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+  .card-name { font-size: 0.95rem; margin: 0.3rem 0; font-weight: 500; }
+  .card-price { color: #d4a84b; font-weight: 600; }
+  .card-size { color: #888; font-size: 0.75rem; float: right; margin-top: 0.2rem; }
+  .card-btn {
+    display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1.2rem;
+    background: #d4a84b; color: #1a1a1a; border-radius: 20px; text-decoration: none;
+    font-size: 0.8rem; font-weight: 600;
+  }
+
+  /* NY! badge */
+  .new-badge {
+    position: absolute; top: 12px; right: 12px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white; padding: 0.25rem 0.6rem; border-radius: 12px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    z-index: 10;
+  }
+  .new-badge.shimmer {
+    background-size: 200% 100%;
+    background-image: linear-gradient(90deg, #ee5a24 0%, #ff9a76 50%, #ee5a24 100%);
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  /* Glow animation */
+  .glow { animation: glowPulse 2s ease-in-out 3; }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(212, 168, 75, 0.3); }
+    50% { box-shadow: 0 0 25px rgba(212, 168, 75, 0.6), 0 0 50px rgba(212, 168, 75, 0.2); }
+  }
+
+  /* PoC info */
+  .poc-info { background: #2a2020; border: 1px solid #d4a84b; padding: 1rem; margin: 1rem; border-radius: 8px; font-size: 0.85rem; }
+  .poc-info h3 { color: #d4a84b; margin-bottom: 0.5rem; }
+  .poc-info button { margin: 0.25rem; padding: 0.3rem 0.8rem; background: #333; color: #ccc; border: 1px solid #555; border-radius: 4px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Vilgots Garderob</h1>
+  <p>PoC: Platt lista + Filter + Animationer + localStorage</p>
+</header>
+
+<div class="poc-info">
+  <h3>PoC-kontroller</h3>
+  <p>Testa animationer och filter. "Rensa localStorage" simulerar ett nytt besök.</p>
+  <button onclick="clearAndReload()">Rensa localStorage + ladda om</button>
+  <button onclick="addNewProduct()">Simulera ny produkt</button>
+  <button onclick="triggerAnimations()">Kör animationer igen</button>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-toggle" onclick="toggleFilters()">Filter</button>
+  <div class="filter-groups" id="filterGroups">
+    <div class="filter-group">
+      <label>Brand:</label>
+      <span class="pill" data-filter="brand" data-value="all" onclick="setFilter(this)">Alla</span>
+      <span class="pill" data-filter="brand" data-value="The Tiny Universe" onclick="setFilter(this)">Tiny Universe</span>
+      <span class="pill" data-filter="brand" data-value="H&M" onclick="setFilter(this)">H&M</span>
+      <span class="pill" data-filter="brand" data-value="Lilax" onclick="setFilter(this)">Lilax</span>
+    </div>
+    <div class="filter-group">
+      <label>Storlek:</label>
+      <span class="pill" data-filter="size" data-value="all" onclick="setFilter(this)">Alla</span>
+      <span class="pill" data-filter="size" data-value="Newborn" onclick="setFilter(this)">Newborn</span>
+      <span class="pill" data-filter="size" data-value="0-3M" onclick="setFilter(this)">0-3M</span>
+      <span class="pill" data-filter="size" data-value="3-6M" onclick="setFilter(this)">3-6M</span>
+    </div>
+    <div class="filter-group">
+      <label>Pris:</label>
+      <span class="pill" data-filter="price" data-value="all" onclick="setFilter(this)">Alla</span>
+      <span class="pill" data-filter="price" data-value="low" onclick="setFilter(this)">&lt;300 kr</span>
+      <span class="pill" data-filter="price" data-value="mid" onclick="setFilter(this)">300-700 kr</span>
+      <span class="pill" data-filter="price" data-value="high" onclick="setFilter(this)">&gt;700 kr</span>
+    </div>
+    <div class="filter-group">
+      <label></label>
+      <span class="pill" data-filter="new" data-value="toggle" onclick="toggleNew(this)">Bara nya</span>
+    </div>
+  </div>
+  <span class="filter-count" id="filterCount"></span>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+// Hårdkodade testprodukter (5 st + simulering av nya)
+const PRODUCTS = [
+  { name: "The Tiny Tuxedo Classic", brand: "The Tiny Universe", price: "490 kr", priceNum: 490, size: "Från 62", sizeGroup: "3-6M", url: "https://thetinyuniverse.com/products/the-tiny-tuxedo-classic-style", img: "https://mikbol.github.io/vilgot-garderob/img/tiny-tuxedo-classic-1.webp" },
+  { name: "4-delat dressat set (Ljusbeige)", brand: "H&M", price: "349 kr", priceNum: 349, size: "Från 56", sizeGroup: "Newborn", url: "#", img: "https://mikbol.github.io/vilgot-garderob/img/hm-4-delat-dressat-ljusbeige.jpg" },
+  { name: "Gentleman Tuxedo Footie", brand: "Lilax", price: "365 kr", priceNum: 365, size: "Från NB", sizeGroup: "Newborn", url: "#", img: "https://mikbol.github.io/vilgot-garderob/img/lilax-tux-grey.jpg" },
+  { name: "Henry Bow Tie & Suspenders Set", brand: "Lulu Babe", price: "280 kr", priceNum: 280, size: "Från 0-3M", sizeGroup: "0-3M", url: "#", img: "https://mikbol.github.io/vilgot-garderob/img/lulu-henry-green.jpg" },
+  { name: "Baby Boy Gentleman Tuxedo Footie", brand: "Lilax", price: "USD 25.99", priceNum: 273, size: "Från 0-3M", sizeGroup: "0-3M", url: "#", img: "https://mikbol.github.io/vilgot-garderob/img/baby-boy-gentleman-tuxedo-footie.jpg" },
+];
+
+// State
+let filters = { brand: 'all', size: 'all', price: 'all', onlyNew: false };
+let seenUrls = new Set(JSON.parse(localStorage.getItem('vilgot-poc-seen') || '[]'));
+
+function isNew(p) { return !seenUrls.has(p.url); }
+
+function priceMatch(p, range) {
+  if (range === 'all') return true;
+  if (range === 'low') return p.priceNum < 300;
+  if (range === 'mid') return p.priceNum >= 300 && p.priceNum <= 700;
+  if (range === 'high') return p.priceNum > 700;
+}
+
+function applyFilters() {
+  const cards = document.querySelectorAll('.card');
+  let visible = 0;
+  cards.forEach((card, i) => {
+    const p = PRODUCTS[card.dataset.idx];
+    const show =
+      (filters.brand === 'all' || p.brand === filters.brand) &&
+      (filters.size === 'all' || p.sizeGroup === filters.size) &&
+      priceMatch(p, filters.price) &&
+      (!filters.onlyNew || isNew(p));
+    card.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+  document.getElementById('filterCount').textContent = `${visible} av ${PRODUCTS.length}`;
+}
+
+function setFilter(el) {
+  const group = el.dataset.filter;
+  const value = el.dataset.value;
+  filters[group] = value;
+  // Update pill states
+  document.querySelectorAll(`.pill[data-filter="${group}"]`).forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function toggleNew(el) {
+  filters.onlyNew = !filters.onlyNew;
+  el.classList.toggle('active', filters.onlyNew);
+  applyFilters();
+}
+
+function toggleFilters() {
+  document.getElementById('filterGroups').classList.toggle('open');
+}
+
+function renderProducts() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  // Reverse: senast tillagda först
+  const sorted = PRODUCTS.map((p, i) => ({ ...p, idx: i })).reverse();
+  sorted.forEach(p => {
+    const isNewProduct = isNew(p);
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.idx = p.idx;
+    if (isNewProduct) card.classList.add('new-product');
+    card.innerHTML = `
+      ${isNewProduct ? '<span class="new-badge shimmer">NY!</span>' : ''}
+      <img class="card-img" src="${p.img}" alt="${p.name}" loading="lazy">
+      <div class="card-body">
+        <div class="card-brand">${p.brand}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-price">${p.price} <span class="card-size">${p.size}</span></div>
+        <a href="${p.url}" class="card-btn">KÖP →</a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  applyFilters();
+}
+
+function triggerAnimations() {
+  const newCards = document.querySelectorAll('.card.new-product:not(.hidden)');
+  if (newCards.length === 0) return;
+
+  // GSAP stagger: elastic bounce in
+  gsap.from(newCards, {
+    scale: 0,
+    opacity: 0,
+    duration: 1,
+    ease: "elastic.out(1, 0.5)",
+    stagger: 0.15,
+    onComplete: () => {
+      // Add glow after bounce
+      newCards.forEach(card => card.classList.add('glow'));
+    }
+  });
+
+  // Konfetti per nytt kort (med delay per kort)
+  newCards.forEach((card, i) => {
+    setTimeout(() => {
+      const rect = card.getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+      confetti({
+        particleCount: 60,
+        spread: 50,
+        origin: { x, y },
+        colors: ['#d4a84b', '#ff6b6b', '#fff'],
+        gravity: 1.2,
+        scalar: 0.8,
+      });
+    }, i * 200 + 500);
+  });
+}
+
+function saveSeen() {
+  const urls = PRODUCTS.map(p => p.url);
+  localStorage.setItem('vilgot-poc-seen', JSON.stringify(urls));
+  seenUrls = new Set(urls);
+}
+
+function clearAndReload() {
+  localStorage.removeItem('vilgot-poc-seen');
+  location.reload();
+}
+
+function addNewProduct() {
+  PRODUCTS.push({
+    name: "Ny Produkt " + (PRODUCTS.length + 1),
+    brand: "The Tiny Universe",
+    price: "599 kr",
+    priceNum: 599,
+    size: "Från 62",
+    sizeGroup: "3-6M",
+    url: "https://example.com/new-" + Date.now(),
+    img: "https://mikbol.github.io/vilgot-garderob/img/tiny-tuxedo-classic-1.webp"
+  });
+  renderProducts();
+  triggerAnimations();
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  // Set "Alla" pills as active
+  document.querySelectorAll('.pill[data-value="all"]').forEach(p => p.classList.add('active'));
+  renderProducts();
+  // Animate new products
+  setTimeout(triggerAnimations, 300);
+  // Save seen after animations
+  setTimeout(saveSeen, 3000);
+});
+</script>
+</body>
+</html>
