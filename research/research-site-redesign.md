@@ -276,7 +276,32 @@ All HTML, CSS och JavaScript i en enda `index.html` (70 KB). Med filtrering, ani
 | D | ES modules (`<script type="module" src="app.mjs">`) | Modern, importerbara moduler, tree-shakeable | GitHub Pages serverar .mjs korrekt. Men add-item.sh injekterar i index.html. |
 | E | Web Components | Enkapsulerade produktkort | Massiv overengineering för 80 produkter. |
 
-add-item.sh och json-helper.py manipulerar PRODUCTS-arrayen i index.html. Att flytta JS till en separat fil kräver att dessa skript också ändras, eller att PRODUCTS förblir i index.html medan rendering-logiken är i app.js (hybrid).
+add-item.sh och json-helper.py manipulerar PRODUCTS-arrayen i index.html. json-helper.py söker efter `const PRODUCTS = ` via regex och injekterar JSON. Den bryr sig inte om övrig filinnehåll.
+
+### Hybrid-approach (ny research 2026-03-18)
+
+PRODUCTS + SECTIONS kvar i index.html (~1450 rader, ~46 KB). All rendering-logik i `app.js` (~300 rader, ~10 KB). CSS i `style.css` (~750 rader, ~20 KB).
+
+**Fördelar:**
+- add-item.sh/json-helper.py behöver INTE ändras (PRODUCTS är kvar i index.html)
+- Claude kan redigera app.js utan att behöva ladda 1450 rader produktdata i context
+- CSS-ändringar isolerade i style.css
+- index.html krymper till ~1500 rader (data + minimal HTML)
+
+**Nackdelar:**
+- 3 filer istället för 1. Men deployas identiskt (git push, GitHub Pages serverar statiska filer).
+
+### Filstorlek och context window
+
+| Fil | Rader | Problem för Claude |
+|---|---|---|
+| index.html (nu) | 2541 | Ja: hela filen måste läsas för att ändra rendering. PRODUCTS tar 1270 rader context som inte behövs. |
+| index.html (hybrid) | ~1500 | Bättre. Men fortfarande 1270 rader produktdata. |
+| app.js (hybrid) | ~300 | Claude redigerar bara detta. Hela filen i context. |
+
+**Fakta:** Claude Code Edit-verktyget arbetar med string-matching. Stora filer gör det svårare att hitta unika strängar. Med 2541 rader ökar risken för edit-kollisioner.
+
+**Slutsats:** Hybrid (PRODUCTS i index.html, rendering i app.js, CSS i style.css) löser context-problemet utan att bryta add-item.sh. Beslutet i sektion 7 ("behåll allt i index.html") bör revideras.
 
 ## 8. PoC krävs
 

@@ -6,14 +6,33 @@ PoC: `poc/v1/` (bekräftad)
 
 ## Mål
 
-Skriva om rendering-logiken i index.html: platt lista, reverse-sortering, localStorage, GSAP-animationer, filter-pills. Alla 80 produkter med bilder, inga sektionsrubriker.
+Bryta ut index.html till 3 filer (index.html med data, app.js med logik, style.css med CSS). Implementera platt lista, reverse-sortering, localStorage, GSAP-animationer, filter-pills. Alla 80 produkter med bilder, inga sektionsrubriker.
 
-## Steg 1: Lägg till GSAP och förbered JS-struktur
+## Steg 0: Bryta ut CSS och JS till separata filer
 
-Lägg till GSAP CDN-import i `<head>` (canvas-confetti finns redan):
+Nuvarande index.html är 2541 rader. Bryt ut:
+
+**style.css:** All CSS från `<style>` till `</style>` (~753 rader). Ersätt med `<link rel="stylesheet" href="style.css">`.
+
+**app.js:** All JS-logik UTOM `const SECTIONS = [...]` och `const PRODUCTS = [...]`. Dessa förblir i index.html (add-item.sh/json-helper.py injekterar i dem). app.js importeras med `<script src="app.js" defer></script>`.
+
+**index.html efter:** HTML-struktur + `<script>` med SECTIONS + PRODUCTS data + CDN-imports. ~1500 rader.
+
+**Verifiering:**
+- `./add-item.sh count` → 80 (json-helper.py hittar fortfarande PRODUCTS)
+- Öppna sajten lokalt → renderar som innan
+- Inga JavaScript-fel i console
+
+**Tid:** 15 min.
+
+## Steg 1: Lägg till GSAP
+
+Lägg till i index.html `<head>`:
 
 ```html
+<link rel="stylesheet" href="style.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="app.js" defer></script>
 ```
 
 **Verifiering:** `typeof gsap` i browser console → `"object"`.
@@ -201,8 +220,8 @@ Anropa `animateNewProducts()` 300ms efter DOMContentLoaded. Anropa `saveSeen()` 
 
 ```bash
 cd /Users/bolm/AI-Assistent/vilgot-kläder/site
-git add index.html
-git commit -m "feat: sajt-redesign (platt lista, filter, GSAP-animationer, localStorage)"
+git add index.html app.js style.css
+git commit -m "feat: sajt-redesign (platt lista, filter, GSAP-animationer, localStorage, 3-fil-struktur)"
 git push origin main
 ```
 
@@ -319,6 +338,7 @@ git push origin main
 
 | Steg | Tid |
 |------|-----|
+| 0. Bryta ut CSS+JS | 15 min |
 | 1. GSAP CDN | 1 min |
 | 2. localStorage | 5 min |
 | 3. Platt lista + sortering | 15 min |
@@ -328,4 +348,4 @@ git push origin main
 | 7. Pages build | 1-3 min |
 | 8. Verifiera live (Chrome fullständig) | 15 min |
 | 9. Dokument | 3 min |
-| **Total** | **86-88 min** |
+| **Total** | **101-103 min** |

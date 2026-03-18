@@ -72,9 +72,13 @@ PoC visade att pills fungerar visuellt. Med 36 brands behövs collapse ("Övriga
 
 ## 9. Kodstruktur
 
-**Beslut: Behåll allt i index.html.**
+**Beslut: Hybrid. PRODUCTS+SECTIONS i index.html, rendering i app.js, CSS i style.css.** (Reviderat 2026-03-18)
 
-Sajten redigeras av agenter (add-item.sh), deployas via git push. En fil är enklast. Uppdelning motiveras inte vid nuvarande storlek.
+Tidigare beslut: allt i index.html. Reviderat baserat på ny research: 2541 rader i en fil gör det svårt att redigera rendering-logiken utan att ladda 1270 rader produktdata i context. add-item.sh/json-helper.py söker efter `const PRODUCTS = ` via regex och behöver inte ändras.
+
+- `index.html`: HTML-struktur + `<script>` med PRODUCTS + SECTIONS data (~1500 rader)
+- `app.js`: Rendering, filtrering, animationer, localStorage (~300 rader)
+- `style.css`: All CSS (~750 rader)
 
 ## Sammanfattning av produktändringar
 
