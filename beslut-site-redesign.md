@@ -6,21 +6,23 @@ Task: `task-site-redesign.md`
 
 ## 1. H&M-produkter utan bilder
 
-**Beslut: Ta bort alla 6 H&M-produkter.**
+**Beslut: Ersätt 5 utgångna H&M-produkter med 4 aktuella. Behåll 1 befintlig med ny bild.**
 
-H&M blockerar alla automatiserade hämtningar (403 vid webfetch, timeout vid WebFetch). Produkterna har inga direkta produktlänkar (pekade på samlingssida). Sortimentet byts varje säsong. Manuell bildhämtning löser problemet tillfälligt men bilderna blir inaktuella.
+5 av 6 H&M-produkter redirectar till startsidan (utgångna). Chrome-automation mot hm.com fungerar (till skillnad från webfetch/curl). Sökning hittade 4 aktuella gentleman-set med väst+fluga+byxor (349-499 kr). Bilder hämtade via Chrome JS.
 
-Motargument: H&M är en känd referenspunkt för "gentleman-set finns billigt". Motargument avvisas: auto-discovery-agenterna hittar liknande produkter från andra butiker kontinuerligt.
+Netto: -5 +4 = -1 H&M-produkt. Alla med bilder och fungerande produktlänkar.
 
 ## 2. Accessoar-placeholders (4 st)
 
-**Beslut: Ta bort 3 Etsy-söksideprodukter. Behåll 1 Amazon-produkt och hämta bild.**
+**Beslut: Hämta bilder för alla 4 via Chrome (Amazon CDN + Etsy).**
 
-3 av 4 är Etsy-marknadssökningar utan specifik produkt. Flat Scally Cap (Born to Love/Amazon) har en riktig produktsida med hämtbar bild.
+Alla 4 bilder hämtade. 3 från Amazon CDN (Born to Love caps), 1 representativ bild från Etsy-söksida.
 
 ## 3. Romper-placeholder (1 st)
 
-**Beslut: Kör auto-discovery-agent med fokus på produkten. Om bild hittas: behåll. Om inte: ta bort.**
+**Beslut: Hämta bild via Chrome (Amazon CDN).**
+
+Bild hämtad.
 
 ## 4. Platt lista
 
@@ -74,8 +76,7 @@ Sajten redigeras av agenter (add-item.sh), deployas via git push. En fil är enk
 
 | Åtgärd | Antal |
 |---|---|
-| Ta bort H&M-produkter | -6 |
-| Ta bort Etsy-söksidor | -3 |
-| Hämta bild (Amazon cap) | 0 (behålls med ny bild) |
-| Romper (agent försöker) | 0 eller -1 |
-| **Resultat** | 65-66 produkter |
+| Ta bort utgångna H&M | -5 |
+| Lägg till aktuella H&M (med bilder) | +4 |
+| Befintliga produkter får bilder | 6 (H&M marinblå, 3 caps, Etsy, romper) |
+| **Resultat** | 74 produkter, alla med bilder |

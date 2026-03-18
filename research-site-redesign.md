@@ -14,44 +14,47 @@ Uppdaterad: 2026-03-17 (verifierade fakta: H&M 403, GSAP gratis, dataanalys)
 
 64 av 75 produkter har bilder.
 
-### H&M bilder (verifierat 2026-03-17)
+### H&M bilder (verifierat 2026-03-18)
 
-**Testat:** Auto-discovery-agenten (OpenCode nemotron-3-super-free) sökte "H&M baby boy 3 piece set bow tie" via websearch, hittade hm.com-sida, försökte webfetch. **Resultat: HTTP 403.** H&M blockerar alla automatiserade hämtningar.
+**Testat:**
+- Auto-discovery-agenten (websearch+webfetch): **HTTP 403**. Kan inte hämta.
+- WebFetch direkt mot hm.com: **timeout**.
+- Chrome-automation: **fungerar**. Produktsidor laddas, bilder extraheras via JS.
+- 5 av 6 H&M-produkter (ID 19, 21, 22, 23, 24): **redirectar till startsidan** (utgångna).
+- 1 H&M-produkt (ID 20, marinblå dressat set): **finns kvar**, bild hämtad.
+- Sökning "baby skjorta dressat kostym" på H&M: **4 aktuella gentleman-set** hittade (349-499 kr).
 
-**Testat:** WebFetch direkt mot hm.com. **Resultat: timeout.** Sidan laddar inte alls.
+**Lösning:** Ersätt 5 utgångna med 4 aktuella. Bilder hämtade via Chrome.
 
-H&M-produkterna har dessutom inga direkta produktlänkar (alla 6 pekade på en samlingssida som vi redan fixat). H&M byter sortiment varje säsong. Dessa 6 produkter representerar inte specifika köpbara artiklar utan kategorier av plagg.
+| Ny produkt | Pris | Artikelnr |
+|---|---|---|
+| 4-delat dressat set i linmix (Ljusbeige) | 349 kr | 1292410004 |
+| 4-delat dressat set i linmix (Khakigrön) | 349 kr | 1292410005 |
+| 4-delat kostymset (Ljusbeige) | 499 kr | 1242064002 |
+| 4-delat dressat set i linmix (Vit/Blå) | 349 kr | 1292410001 |
 
-**Tre alternativ:**
+### Accessoarer (verifierat 2026-03-18)
 
-| # | Approach | Automatiserbart | Hållbart |
-|---|---|---|---|
-| A | Hämta bilder manuellt i Chrome | Nej | Nej (bilder blir inaktuella) |
-| B | Ta bort H&M-produkterna | Ja | Ja |
-| C | Ersätt med snyggare placeholders (CSS-illustrationer istället för text) | Ja | Ja |
+Alla 4 bilder hämtade via Chrome:
+- Born to Love Flat Scally Cap: Amazon CDN, `#landingImage` data-old-hires
+- Born to Love Tweed Driver Cap: Amazon CDN
+- Born to Love Herringbone Newsboy: Amazon CDN
+- Newsboy Hat + Suspenders (Etsy söksida): första sökresultatets bild, uppskallad till 794px
 
-### Accessoarer (Born to Love, Amazon, Etsy)
+### Romper (verifierat 2026-03-18)
 
-- Born to Love: Amazon-produkter. Bilder tillgängliga via Amazon CDN (`m.media-amazon.com`), ingen anti-bot.
-- Etsy-marknadssidor: kan inte hämta specifika produktbilder (sökresultat, inte fasta produkter)
-- Newsboy Hat + Suspenders Sets (Etsy): sökresultat-sida. Ingen specifik produktbild.
-
-3 av 4 accessoarer är söksidor utan specifik produkt. Bara Flat Scally Cap (Born to Love/Amazon) har en riktig produktsida.
-
-### Romper (Gentleman Waistcoat Tuxedo Onesie)
-
-Generisk AliExpress-stil produkt. Kan sökas upp via auto-discovery-agenten.
+Gentleman Waistcoat Tuxedo Onesie: bild hämtad via Amazon CDN (`#landingImage`).
 
 ### Sammanfattning bilder
 
-| Grupp | Antal | Bild hämtbar automatiskt? |
+| Grupp | Antal | Bild hämtad? |
 |---|---|---|
-| H&M | 6 | Nej (403, timeout) |
-| Accessoarer (Amazon) | 1 | Ja |
-| Accessoarer (Etsy sök) | 3 | Nej (inte specifika produkter) |
-| Romper | 1 | Troligen ja (generisk produkt) |
-| **Kan fixas automatiskt** | **2** | |
-| **Kräver manuellt eller borttagning** | **9** | |
+| H&M befintlig (marinblå) | 1 | Ja (Chrome) |
+| H&M utgångna → ersatta med aktuella | 5 → 4 | Ja (Chrome) |
+| Accessoarer (Amazon) | 3 | Ja (Chrome) |
+| Accessoarer (Etsy sök) | 1 | Ja (Chrome, representativ) |
+| Romper (Amazon) | 1 | Ja (Chrome) |
+| **Alla 11 lösta** | **10 bilder** | |
 
 ## 2. Platt lista (ta bort sektioner)
 
