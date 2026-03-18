@@ -1,7 +1,9 @@
 # Beslut: Sajt-redesign
 
 Datum: 2026-03-18
+Uppdaterad: 2026-03-18 (PoC-resultat bekräftar beslut 4-9)
 Research: `research/research-site-redesign.md`
+PoC: `poc/v1/` (testad, resultat i `poc/v1/RESULTAT.md`)
 Task: `task-site-redesign.md`
 
 ## 1. H&M-produkter utan bilder
@@ -44,9 +46,9 @@ Spara sedda produkt-URL:er i `vilgot-seen-urls`. URL:er är unika och stabila ä
 
 ## 7. Animationer
 
-**Beslut: GSAP 3.13 via CDN + befintlig canvas-confetti.**
+**Beslut: GSAP 3.13 via CDN + befintlig canvas-confetti.** (Bekräftat via PoC v1)
 
-GSAP är gratis (Webflow-sponsrat), 70 KB, branschstandard. Effekter för nya produkter:
+GSAP är gratis (Webflow-sponsrat), 70 KB, branschstandard. PoC bekräftade att elastic bounce + stagger + konfetti ger den wow-faktor som eftersöks. CSS-only räcker inte (saknar stagger, elastic easing). anime.js hade fungerat men GSAP var enklare att implementera. Effekter för nya produkter:
 - Elastic scale bounce (kort poppar upp)
 - Glow pulse (CSS box-shadow)
 - Stagger (kort efter kort i kaskad)
@@ -57,7 +59,9 @@ Animeras bara vid första sidladdningen för produkter som inte finns i localSto
 
 ## 8. Filtrering
 
-**Beslut: Sticky filter-bar med pills.**
+**Beslut: Sticky filter-bar med pills.** (Bekräftat via PoC v1)
+
+PoC visade att pills fungerar visuellt. Med 36 brands behövs collapse ("Övriga"). Mobil 375px: filter collapsar till "Filter"-knapp, acceptabelt.
 
 - **Brand:** Topp 9 (3+ produkter) som pills + "Övriga" som expanderbar grupp
 - **Storlek:** 7 normaliserade grupper (Prematur, Newborn, 0-3M, 3-6M, 6M+, 56-62, One size)
@@ -79,4 +83,8 @@ Sajten redigeras av agenter (add-item.sh), deployas via git push. En fil är enk
 | Ta bort utgångna H&M | -5 |
 | Lägg till aktuella H&M (med bilder) | +4 |
 | Befintliga produkter får bilder | 6 (H&M marinblå, 3 caps, Etsy, romper) |
-| **Resultat** | 74 produkter, alla med bilder |
+| **Resultat** | 80 produkter, alla med bilder |
+
+## PoC-validering
+
+Beslut 4-9 bekräftade via `poc/v1/index.html` (Chrome desktop + 375px mobil, 2026-03-18). 11/11 features fungerar. Se `poc/v1/RESULTAT.md`.

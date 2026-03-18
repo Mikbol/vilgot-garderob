@@ -2,7 +2,7 @@
 
 Skapad: 2026-03-17
 
-## Status: PoC KLAR, redo för beslut
+## Status: PLAN KLAR, redo för exekvering
 
 ## Mål
 
@@ -58,8 +58,9 @@ Alla produkter ska ha riktiga bilder. Sajten ska ha platt lista (inga sektioner)
 ## Nästa steg
 
 1. ~~PoC~~ ✅ (`poc/v1/index.html`, Chrome-verifierad desktop+mobil, se `poc/v1/RESULTAT.md`)
-2. Uppdatera beslutsdokumentet baserat på PoC-resultat.
-3. Skapa plan för punkt 2-6.
+2. ~~Beslut uppdaterat med PoC-resultat~~ ✅
+3. ~~Plan skapad~~ ✅ (`plan-site-redesign.md`)
+4. Exekvera planen.
 
 Punkt 2+6 implementeras i samma steg (beroende). Punkt 3-5 kan göras separat eller ihop.
 
