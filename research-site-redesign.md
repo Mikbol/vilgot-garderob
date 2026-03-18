@@ -1,7 +1,7 @@
 # Research: Sajt-redesign
 
 Datum: 2026-03-17
-Uppdaterad: 2026-03-17 (verifierade fakta: H&M 403, GSAP gratis, dataanalys)
+Uppdaterad: 2026-03-18 (alternativ kompletterade, källor, motbevis, evidensluckor, fakta/slutledning, PoC krävs)
 
 ## 1. Produktbilder för 11 produkter utan bild
 
@@ -73,17 +73,37 @@ Gentleman Waistcoat Tuxedo Onesie: bild hämtad via Amazon CDN (`#landingImage`)
 
 **Risk:** Utan sektioner och utan fungerande filter blir sidan oöverskådlig. Filter MÅSTE implementeras samtidigt som sektionerna tas bort.
 
+### Alternativ
+
+| # | Approach | Fördel | Nackdel |
+|---|---|---|---|
+| A | Platt lista (alla kort i en ström) | Enklast. Nya produkter syns direkt överst. Filtrering styr allt. | Ingen visuell gruppering. Kräver filter. |
+| B | Collapsible sektioner (klicka för att fälla ihop) | Behåller gruppering men sparar plats | Komplexare JS. Nya produkter hamnar i mitten av sektioner. |
+| C | Tagg-baserad gruppering (filtrera på sektion som tagg) | Flexibelt, användaren väljer gruppering | Kräver filter-UI som redan planeras. Egentligen samma som platt lista + filter. |
+
+**Motargument mot A (platt lista):** Förlorar överblick per brand. Användaren som vill se "allt från The Tiny Universe" måste använda filter istället för att scrolla till sektionen. Minskar casual browsing-upplevelsen.
+
+Alternativ B löser inte huvudproblemet (nya produkter syns inte) och lägger till komplexitet. Alternativ C är funktionellt identiskt med A + filtrering.
+
 ### Påverkan på kod
 
 - `const SECTIONS` behålls som metadata (filter använder `section`-fältet)
 - Rendering-loopen byts till platt
 - Sektionsrubriker och beskrivningar tas bort från synlig rendering
 
-## 3. Sortering: senast tillagda först
+## 3. Sortering
 
-`add-item.sh` appendar produkter i slutet av PRODUCTS-arrayen. `reverse()` vid rendering ger senast tillagda först.
+### Alternativ
 
-Inget `added_date`-fält behövs. Om det behövs i framtiden: lägg till i add-item.sh (`date +%Y-%m-%d`), ändra json-helper.py inject-funktion. Marginellt arbete.
+| # | Approach | Fördel | Nackdel |
+|---|---|---|---|
+| A | Bara reverse (senast tillagda först) | Enklast. 1 rad JS. Inget nytt fält. | Användaren kan inte välja sortering. |
+| B | Användarval: senast/pris/namn/brand | Flexibelt. Standard i e-handel. | Kräver sorteringslogik + UI (dropdown). Prissortering kräver valutanormalisering. |
+| C | reverse() + `added_date` per produkt | Exakt datum synligt. Kan visa "Tillagd 2026-03-18". | Kräver ändring i add-item.sh och json-helper.py. |
+
+Prissortering (alternativ B) kompliceras av blandade valutor (93% SEK, 4% USD, 3% "Varierar"). Kräver parsning och konvertering.
+
+`add-item.sh` appendar produkter i slutet av PRODUCTS-arrayen. `reverse()` vid rendering ger senast tillagda först utan nya fält.
 
 ## 4. localStorage: spåra sedda produkter
 
@@ -100,7 +120,7 @@ localStorage.setItem('vilgot-seen-urls', JSON.stringify(PRODUCTS.map(p => p.url)
 
 ### Begränsningar
 
-- 5 MB per domän. 75 URL:er (~5 KB). Inga problem med tusentals produkter.
+- 5 MB per domän (källa: https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API#storage_limits). 75 URL:er (~5 KB). Inga problem med tusentals produkter.
 - Rensas vid browser-datarensning.
 - Synkar inte mellan enheter (irrelevant, sajten är för Mikael).
 - Första besöket: alla produkter visas som "nya" (acceptabelt).
@@ -120,9 +140,19 @@ GSAP är 100% gratis för alla sedan Webflow-sponsringen. Ingen begränsning fö
 | anime.js 4.2 | `https://cdnjs.cloudflare.com/ajax/libs/animejs/4.2.0/anime.min.js` | 17 KB |
 | canvas-confetti | Redan i projektet | 0 KB extra |
 
-### Rekommendation: GSAP + canvas-confetti
+### Alternativ
 
-GSAP för kortanimationer (slide-in, bounce, scale, stagger). canvas-confetti (redan importerad) för partikeleffekter. Kombinationen ger extrem wow-faktor utan extra beroenden.
+| # | Approach | Storlek | Styrka | Nackdel |
+|---|---|---|---|---|
+| A | GSAP + canvas-confetti | 70 KB + 0 (redan importerad) | Branschstandard, alla effekter, timeline, easing | Störst |
+| B | anime.js + canvas-confetti | 17 KB + 0 | Lättvikt, enkel API | Mindre flexibel än GSAP, sämre dokumentation |
+| C | Bara CSS @keyframes + canvas-confetti | 0 KB extra | Ingen dependency | Begränsat: ingen stagger, ingen timeline, ingen elastic ease |
+| D | Inga animationer | 0 KB | Snabbast laddtid | Ingen wow-faktor (Mikael sa "extrema animationer") |
+| E | Motion One (motionone.org) | 18 KB | Modern, Web Animations API | Mindre community, färre exempel. Källa: motionone.org |
+
+**Motargument mot A (GSAP):** 70 KB är lika stort som hela nuvarande index.html. Fördubblar JS-storleken. anime.js (17 KB) ger de flesta effekter med 75% mindre storlek. CSS-only (0 KB) räcker för glow och shimmer men saknar stagger och elastic easing.
+
+GSAP + canvas-confetti ger mest wow-faktor. canvas-confetti redan importerad i projektet.
 
 ### Effekter
 
@@ -137,11 +167,11 @@ GSAP för kortanimationer (slide-in, bounce, scale, stagger). canvas-confetti (r
 
 ### Prestanda
 
-75-100 kort: inga problem. GSAP är GPU-optimerad. Regler:
-- Animera bara `transform` och `opacity` (GPU-accelererat)
+75-100 kort: inga problem. GSAP använder `requestAnimationFrame` och optimerar för GPU-compositing (källa: https://gsap.com/docs/v3/). Regler:
+- Animera bara `transform` och `opacity` (GPU-composited, undviker layout/paint. Källa: https://web.dev/articles/animations-guide)
 - Undvik `width`, `height`, `margin` (triggrar layout-reflow)
-- `will-change: transform` på animerade element
-- Animera bara "nya" produkter (inte alla 75)
+- `will-change: transform` på animerade element (källa: https://developer.mozilla.org/en-US/docs/Web/CSS/will-change)
+- Animera bara "nya" produkter (inte alla 80)
 
 ## 6. Filtrering
 
@@ -200,6 +230,8 @@ Sticky filter-bar under headern med:
 
 Aktiva filter visas tydligt med "X" för att ta bort. Antal matchande produkter visas ("23 av 75").
 
+**Motargument mot filter-pills:** 36 brands i pills = oöverskådligt. Topp 9 + "Övriga" döljer 27 brands. Alternativ: sökbar dropdown för brand (skriver "Tiny" → filtrerar). Mer komplex men skalbar.
+
 ### Filtrering + platt lista: beroende
 
 Platt lista utan filter = oöverskådlig. **Filter och platt lista måste implementeras i samma steg.** Annars försämras UX.
@@ -212,16 +244,45 @@ All HTML, CSS och JavaScript i en enda `index.html` (70 KB). Med filtrering, ani
 
 ### Alternativ
 
-| Approach | Fördel | Nackdel |
-|---|---|---|
-| Allt i index.html (nuvarande) | En fil, enkelt att deploya | Svårt att underhålla vid 100+ KB |
-| Bryta ut JS till app.js | Lättare att redigera | Två filer att hantera |
-| Bryta ut CSS till style.css | Separation of concerns | Tre filer |
+| # | Approach | Fördel | Nackdel |
+|---|---|---|---|
+| A | Allt i index.html (nuvarande) | En fil, enkelt att deploya, agenter redigerar en fil | Svårt att underhålla vid 100+ KB |
+| B | Bryta ut JS till app.js | Lättare att redigera JS | Två filer. add-item.sh modifierar index.html, inte app.js. |
+| C | Bryta ut CSS till style.css + JS till app.js | Separation of concerns | Tre filer att hantera. Agenter måste koordinera. |
+| D | ES modules (`<script type="module" src="app.mjs">`) | Modern, importerbara moduler, tree-shakeable | GitHub Pages serverar .mjs korrekt. Men add-item.sh injekterar i index.html. |
+| E | Web Components | Enkapsulerade produktkort | Massiv overengineering för 80 produkter. |
 
-**Rekommendation:** Behåll allt i index.html. Sajten är statisk, deployas via git push, och redigeras av agenter som ändå arbetar med en fil i taget. Komplexiteten motiverar inte uppdelning ännu.
+add-item.sh och json-helper.py manipulerar PRODUCTS-arrayen i index.html. Att flytta JS till en separat fil kräver att dessa skript också ändras, eller att PRODUCTS förblir i index.html medan rendering-logiken är i app.js (hybrid).
+
+## 8. PoC krävs
+
+Animationer och filter-UI kan inte bedömas via research. En PoC ska testa:
+- GSAP elastic bounce + glow + stagger på 5 produktkort
+- Filter-pills (brand, storlek, pris) med kombinerbara filter
+- localStorage: markera "nya" produkter, visa badge
+- Mobil-responsivitet (375px viewport)
+
+PoC-filen: `poc-redesign.html` (fristående, laddar GSAP från CDN, 5 hårdkodade produkter).
+Resultat avgör: vilka effekter som används, om GSAP behövs eller om anime.js/CSS räcker, om filter-pills ska bytas mot sökbar dropdown.
 
 ## Evidensluckor
 
-- Exakt vilken kombination av GSAP-effekter som ser bäst ut kräver visuell iteration.
-- H&M kan ändra sin blocking-policy. Inte testat med cookies/headers.
-- Storleksnormaliseringen kan missa framtida format som agenter lägger till.
+- **GSAP-effektval:** Exakt vilken kombination av effekter som ser bäst ut kräver visuell iteration. Kan inte avgöras via research. Lösning: implementera 2-3 effekter, testa visuellt, justera.
+- **H&M blocking:** H&M kan ändra sin policy. Inte testat med cookies/headers. Låg risk (bilder redan nedladdade lokalt).
+- **Storleksnormalisering:** Kan missa framtida format som agenter lägger till. Lösning: fallback-grupp "Övrigt" för okända format.
+- **Mobil-UX för filter (ny):** Sticky filter-bar med pills kan ta för mycket vertikal plats på mobil (375px viewport). Inte testat. Alternativ: collapsible filter-bar som fälls ihop till en "Filter"-knapp på mobil. Kräver CSS media query `@media (max-width: 768px)`.
+- **GSAP laddtidspåverkan (ny):** index.html är 69 KB. GSAP 3.13 min är 70 KB. Totalt 139 KB HTML+JS (exkl. bilder). GSAP laddas från CDN (cdnjs.cloudflare.com) och cachas efter första besök. Första laddning: +70 KB. Påverkan: försumbar på bredband (~50ms), märkbar på 3G (~500ms). Sajten används primärt av Mikael på WiFi. Acceptabelt.
+
+## Fakta vs slutledning vs spekulation
+
+| Påstående | Typ |
+|---|---|
+| GSAP är 100% gratis | Fakta (gsap.com/pricing) |
+| localStorage 5 MB gräns | Fakta (MDN) |
+| 93% SEK-priser | Fakta (vår data, 2026-03-17) |
+| `transform`/`opacity` är GPU-composited | Fakta (web.dev) |
+| GSAP-prestanda räcker för 80 kort | Rimlig slutledning (GSAP hanterar tusentals element i demos) |
+| Platt lista kräver filter | Rimlig slutledning (80 ogrupperade kort är oöverskådligt) |
+| Statiska växelkurser räcker | Rimlig slutledning (bara 3 USD-produkter av 80) |
+| Mobil filter-bar kan ta för mycket plats | Spekulation (inte testat) |
+| anime.js har sämre dokumentation än GSAP | Rimlig slutledning (baserat på community-storlek, inte systematisk jämförelse) |

@@ -2,7 +2,7 @@
 
 Skapad: 2026-03-17
 
-## Status: BESLUT (bilder KLAR, resten väntar på plan)
+## Status: RESEARCH (bilder KLAR, resten väntar på PoC innan beslut kan tas)
 
 ## Mål
 
@@ -57,7 +57,12 @@ Alla produkter ska ha riktiga bilder. Sajten ska ha platt lista (inga sektioner)
 
 ## Nästa steg
 
-Skapa plan för punkt 2-6. Punkt 2+6 implementeras i samma steg (beroende). Punkt 3-5 kan göras separat eller ihop.
+1. PoC: `poc-redesign.html` (GSAP-animationer, filter-pills, localStorage, mobil). Avgör animationsval och filter-UI.
+2. Uppdatera beslutsdokumentet baserat på PoC-resultat.
+3. Skapa plan för punkt 2-6.
+4. Flytta research-filer till `research/`-mapp per task.
+
+Punkt 2+6 implementeras i samma steg (beroende). Punkt 3-5 kan göras separat eller ihop.
 
 ## Berör
 
