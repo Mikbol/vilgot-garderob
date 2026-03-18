@@ -2,7 +2,7 @@
 
 Skapad: 2026-03-17
 
-## Status: PLAN KLAR, redo för exekvering
+## Status: KLAR
 
 ## Mål
 
@@ -23,46 +23,33 @@ Alla produkter ska ha riktiga bilder. Sajten ska ha platt lista (inga sektioner)
 - Plan: `plan-fix-site-issues.md`
 - Resultat: 10 samlingslänkar→produktsidor, 1 trasig bild fixad (.webp→.jpg), 1 utgången Jacadi borttagen. Chrome-verifierat.
 
-### 2. Platt lista (ta bort sektioner)
+### 2. Platt lista (ta bort sektioner) ✅ KLAR
 
-- Research: `research/research-site-redesign.md` (sektion 2)
-- Beslut: `beslut-site-redesign.md` (punkt 4)
-- Plan: ⬜
-- **Beroende:** Filtrering måste implementeras samtidigt (platt lista utan filter = oöverskådligt).
+- Plan: `plan-site-redesign.md`
+- Resultat: 0 sektionsrubriker, 80 kort i platt ström, senast tillagda överst.
 
-### 3. Sortering senast tillagda först
+### 3. Sortering senast tillagda först ✅ KLAR
 
-- Research: `research/research-site-redesign.md` (sektion 3)
-- Beslut: `beslut-site-redesign.md` (punkt 5)
-- Plan: ⬜
+- Resultat: reverse() vid rendering. Nya produkter från auto-discovery hamnar överst.
 
-### 4. localStorage för sedda produkter
+### 4. localStorage för sedda produkter ✅ KLAR
 
-- Research: `research/research-site-redesign.md` (sektion 4)
-- Beslut: `beslut-site-redesign.md` (punkt 6)
-- Plan: ⬜
+- Resultat: URL-baserat schema, 80 URL:er sparade. Bara nya (0) visar 0 vid andra besöket.
 
-### 5. Extrema animationer för nya produkter
+### 5. Extrema animationer för nya produkter ✅ KLAR
 
-- Research: `research/research-site-redesign.md` (sektion 5)
-- Beslut: `beslut-site-redesign.md` (punkt 7)
-- Plan: ⬜
+- Resultat: GSAP elastic bounce + stagger + glow + confetti per nytt kort. NY!-badge med shimmer.
 
-### 6. Filtrering
+### 6. Filtrering ✅ KLAR
 
-- Research: `research/research-site-redesign.md` (sektion 6)
-- Beslut: `beslut-site-redesign.md` (punkt 8)
-- Plan: ⬜
-- **Beroende:** Implementeras samtidigt som platt lista.
+- Resultat: Brand (topp 9 + Övriga 42), storlek (7 grupper), pris (3 intervall), bara nya. Kombinerbara. "80 av 80" räknare. Mobil 375px: collapsar till "Filter"-knapp.
 
 ## Nästa steg
 
-1. ~~PoC~~ ✅ (`poc/v1/index.html`, Chrome-verifierad desktop+mobil, se `poc/v1/RESULTAT.md`)
-2. ~~Beslut uppdaterat med PoC-resultat~~ ✅
-3. ~~Plan skapad~~ ✅ (`plan-site-redesign.md`)
-4. Exekvera planen.
-
-Punkt 2+6 implementeras i samma steg (beroende). Punkt 3-5 kan göras separat eller ihop.
+1. ~~PoC~~ ✅
+2. ~~Beslut~~ ✅
+3. ~~Plan~~ ✅
+4. ~~Exekvering~~ ✅ (Chrome-verifierad live: 80 kort, 83/83 bilder, 0 sektioner, filter fungerar, mobil OK)
 
 ## Berör
 
