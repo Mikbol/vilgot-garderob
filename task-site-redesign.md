@@ -17,6 +17,12 @@ Alla produkter ska ha riktiga bilder. Sajten ska ha platt lista (inga sektioner)
 - Plan: `plan-fix-missing-images.md`
 - Resultat: 80 produkter, alla med bilder. 5 utgångna H&M ersatta med 4 aktuella. Chrome-verifierat 83/83 bilder.
 
+### 1b. Sajt-problem (samlingslänkar, trasig bild) ✅ KLAR
+
+- Research: `research-site-issues.md`
+- Plan: `plan-fix-site-issues.md`
+- Resultat: 10 samlingslänkar→produktsidor, 1 trasig bild fixad (.webp→.jpg), 1 utgången Jacadi borttagen. Chrome-verifierat.
+
 ### 2. Platt lista (ta bort sektioner)
 
 - Research: `research-site-redesign.md` (sektion 2)
