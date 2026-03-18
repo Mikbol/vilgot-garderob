@@ -32,17 +32,23 @@ Bild hämtad.
 
 Behåll `section`-fältet per produkt som metadata (används av filtret). Implementera filtrering i samma steg (platt lista utan filter = oöverskådligt).
 
+Bortvalda: Collapsible sektioner (löser inte att nya produkter hamnar i mitten), tagg-baserad gruppering (identiskt med platt lista + filter).
+
 ## 5. Sortering
 
 **Beslut: `[...PRODUCTS].reverse()` vid rendering.**
 
 Inget `added_date`-fält. Index = tillagd ordning, reverse = senast först. Om det behövs i framtiden kan `added_date` läggas till utan att bryta befintlig data.
 
+Bortvalda: Användarval av sortering (pris/namn/brand) kräver valutanormalisering och UI, oproportionerlig komplexitet för sajten. added_date-fält kräver ändring i add-item.sh/json-helper.py utan tydligt värde.
+
 ## 6. localStorage
 
 **Beslut: URL-baserat schema.**
 
 Spara sedda produkt-URL:er i `vilgot-seen-urls`. URL:er är unika och stabila även om produkter tas bort. Första besöket: alla visas som "nya" (acceptabelt).
+
+Bortvalda: Index-baserat (havererar vid remove), hash-baserat (kolliderar om namn ändras), URL+timestamp (timestamp tillför inget värde).
 
 ## 7. Animationer
 
@@ -56,6 +62,8 @@ GSAP är gratis (Webflow-sponsrat), 70 KB, branschstandard. PoC bekräftade att 
 - "NY!" badge med shimmer-animation
 
 Animeras bara vid första sidladdningen för produkter som inte finns i localStorage. Markeras som "sedda" efter animering.
+
+Bortvalda: anime.js (17 KB, fungerar men färre easing-funktioner, PoC visade GSAP enklare), CSS-only (saknar stagger+elastic), Motion One (mindre community), inga animationer (Mikael specificerade "extrema animationer").
 
 ## 8. Filtrering
 
@@ -79,6 +87,51 @@ Tidigare beslut: allt i index.html. Reviderat baserat på ny research: 2541 rade
 - `index.html`: HTML-struktur + `<script>` med PRODUCTS + SECTIONS data (~1500 rader)
 - `app.js`: Rendering, filtrering, animationer, localStorage (~300 rader)
 - `style.css`: All CSS (~750 rader)
+
+## Krav (testbara)
+
+### Platt lista
+- Inga sektionsrubriker (h2) synliga i rendering
+- Alla 80 produkter visas i en enda ström
+- Senast tillagda produkter överst
+
+### Filtrering
+- Filter för brand, storlek, pris, "bara nya" ska finnas
+- Alla filter kombinerbara (brand + storlek + pris samtidigt)
+- Filtrering ska vara omedelbar (ingen sidladdning, DOM show/hide)
+- Räknare visar "X av Y" produkter
+- Mobil (375px): filter collapsar till en knapp
+
+### Animationer
+- Nya produkter (inte i localStorage) animeras vid sidladdning
+- Elastic bounce + glow + konfetti per nytt kort
+- Animationer körs en gång, sedan markeras produkten som sedd
+- Om 0 nya produkter: ingen animation
+- Animationer blockar inte interaktion (användaren kan scrolla under animation)
+
+### localStorage
+- Sedda produkter sparas som URL:er
+- Rensa localStorage → alla produkter visas som "nya" igen
+- Funkar utan localStorage (graceful degradation: alla visas utan "ny"-markering)
+
+### Kodstruktur
+- PRODUCTS och SECTIONS kvar i index.html (add-item.sh fungerar utan ändring)
+- `./add-item.sh count` returnerar korrekt antal efter redesign
+- app.js och style.css laddas korrekt från GitHub Pages
+
+### Verifiering
+- Chrome fullVerify: 0 trasiga bilder, alla kort synliga, alla filter fungerar
+- Mobil 375px: layout korrekt, filter collapsar
+- Alla bilder renderar (complete && naturalWidth > 0)
+
+## Avgränsningar
+
+- Ingen sökfunktion (frisökning). Filter räcker.
+- Ingen användarval av sortering (pris/namn). Bara reverse (senast först).
+- Ingen dark/light mode ändring (behålls som den är).
+- Ingen ändring av add-item.sh, json-helper.py, orchestrate.sh eller agents.
+- Befintligt custom konfetti-system (Confetti.burst/rain, ~80 rader canvas-kod) tas bort helt. Ersätts med canvas-confetti CDN.
+- Befintlig confetti-canvas HTML-element tas bort.
 
 ## Sammanfattning av produktändringar
 
