@@ -8,7 +8,7 @@ PoC: `poc/v1/` (bekräftad)
 
 Bryta ut index.html till 3 filer (index.html med data, app.js med logik, style.css med CSS). Implementera platt lista, reverse-sortering, localStorage, GSAP-animationer, filter-pills. Alla 80 produkter med bilder, inga sektionsrubriker.
 
-## Steg 0: Bryta ut CSS och JS till separata filer
+## Steg 0: Bryta ut CSS och JS till separata filer ✅ DONE
 
 Nuvarande index.html är 2541 rader. Bryt ut:
 
@@ -25,7 +25,7 @@ Nuvarande index.html är 2541 rader. Bryt ut:
 
 **Tid:** 15 min.
 
-## Steg 1: Lägg till GSAP
+## Steg 1: Lägg till GSAP ✅ DONE
 
 Lägg till i index.html `<head>`:
 
@@ -39,7 +39,7 @@ Lägg till i index.html `<head>`:
 
 **Tid:** 1 min.
 
-## Steg 2: Implementera localStorage
+## Steg 2: Implementera localStorage ✅ DONE
 
 Lägg till i JavaScript (före rendering):
 
@@ -58,7 +58,7 @@ Anropa `saveSeen()` 3 sekunder efter sidladdning (efter animationer kört klart)
 
 **Tid:** 5 min.
 
-## Steg 3: Byt rendering till platt lista med reverse-sortering
+## Steg 3: Byt rendering till platt lista med reverse-sortering ✅ DONE
 
 Ersätt nuvarande sektionsbaserade rendering-loop med:
 
@@ -91,7 +91,7 @@ Behåll:
 
 **Tid:** 15 min.
 
-## Steg 4: Implementera filter-bar
+## Steg 4: Implementera filter-bar ✅ DONE
 
 Lägg till HTML ovanför grid:
 
@@ -175,7 +175,7 @@ CSS: sticky filter-bar, pills, mobil collapse (se PoC för exakt CSS).
 
 **Tid:** 30 min.
 
-## Steg 5: Implementera animationer
+## Steg 5: Implementera animationer ✅ DONE
 
 Lägg till CSS för glow och shimmer (se PoC). Lägg till JS efter rendering:
 
@@ -216,7 +216,7 @@ Anropa `animateNewProducts()` 300ms efter DOMContentLoaded. Anropa `saveSeen()` 
 
 **Tid:** 15 min.
 
-## Steg 6: Commit och push
+## Steg 6: Commit och push ✅ DONE
 
 ```bash
 cd /Users/bolm/AI-Assistent/vilgot-kläder/site
@@ -227,7 +227,7 @@ git push origin main
 
 **Tid:** 1 min.
 
-## Steg 7: Vänta på Pages build
+## Steg 7: Vänta på Pages build ✅ DONE
 
 ```bash
 for i in 1 2 3 4 5; do
@@ -240,7 +240,7 @@ done
 
 **Tid:** 1-3 min.
 
-## Steg 8: Verifiera live-sajt (OBLIGATORISK, alla delar)
+## Steg 8: Verifiera live-sajt (OBLIGATORISK, alla delar) ✅ DONE (med noteringar)
 
 ### 8a. Fullständig sajt-verifiering (Chrome, OBLIGATORISK)
 
@@ -318,7 +318,7 @@ Scrolla genom hela sidan och ta screenshots var 5:e scroll. Bekräfta att:
 
 **Tid:** 15 min.
 
-## Steg 9: Uppdatera dokument
+## Steg 9: Uppdatera dokument ✅ DONE
 
 - `task-site-redesign.md`: markera punkt 2-6 som ✅, status → KLAR
 - `beslut-site-redesign.md`: notera implementation genomförd
@@ -326,6 +326,22 @@ Scrolla genom hela sidan och ta screenshots var 5:e scroll. Bekräfta att:
 - `plan-site-redesign.md`: resultat per steg
 
 **Tid:** 3 min.
+
+## Verifieringsresultat (2026-03-18)
+
+| Check | Resultat |
+|---|---|
+| 8a. fullVerify (GSAP, confetti, kort, h2) | ✅ 80 kort, 0 h2, GSAP+confetti laddade |
+| 8a. Bilder (force-eager) | ✅ 82/83 direkt, 83/83 efter scroll+force |
+| 8b. Filter H&M | ✅ 5 av 80 |
+| 8b. Filter pris >700 | ✅ 25 av 80 |
+| 8c. localStorage live (rensa+ladda om) | ✅ NY!-badges + animationer + konfetti |
+| 8d. Mobil 375px live | ✅ 2-kolumns grid, filter synligt (collapsar inte vid just denna viewport) |
+| 8e. Visuell granskning | ✅ Scrollat hela sajten, alla bilder visar rätt plagg, inga tomma kort |
+
+### Känt problem
+
+**Konfetti vid 80 nya kort:** Första besöket (alla kort nya) triggar konfetti per kort = ~80 bursts. Blockerar vyn i ~20 sekunder. Normalt scenario (1-5 nya per dag) är OK. **Accepterat av Mikael** (2026-03-18): första besöket är en engång.
 
 ## Rollback
 
