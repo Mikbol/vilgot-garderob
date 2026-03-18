@@ -1,7 +1,7 @@
 # Beslut: Sajt-redesign
 
 Datum: 2026-03-18
-Research: `research-site-redesign.md`
+Research: `research/research-site-redesign.md`
 Task: `task-site-redesign.md`
 
 ## 1. H&M-produkter utan bilder

@@ -103,13 +103,24 @@ Alternativ B löser inte huvudproblemet (nya produkter syns inte) och lägger ti
 
 Prissortering (alternativ B) kompliceras av blandade valutor (93% SEK, 4% USD, 3% "Varierar"). Kräver parsning och konvertering.
 
+**Motargument mot A (bara reverse):** Användaren kan aldrig se billigaste produkten först. Med 80+ produkter och blandade priser (100-7000 kr) är prissortering användbart. Motargumentet väger tungt om sajten ska användas för att köpa (jämföra priser), men mindre om syftet är inspiration (se vad som finns).
+
 `add-item.sh` appendar produkter i slutet av PRODUCTS-arrayen. `reverse()` vid rendering ger senast tillagda först utan nya fält.
 
 ## 4. localStorage: spåra sedda produkter
 
-### Schema: URL-baserat
+### Alternativ schema
 
-Produktindex ändras om produkter tas bort. URL:er är unika och stabila.
+| # | Schema | ID-typ | Stabilitet vid remove | Storlek per produkt |
+|---|---|---|---|---|
+| A | URL-baserat | Produktens URL | Stabil (URL ändras inte vid remove) | ~80 bytes |
+| B | Index-baserat | Position i PRODUCTS-arrayen | Instabil (alla index ändras vid remove) | ~4 bytes |
+| C | Hash av namn+brand+url | SHA-liknande hash | Stabil, men kolliderar om namn ändras | ~32 bytes |
+| D | URL + timestamp | URL + senast sedd | Stabil + kan visa "sedd för 3 dagar sedan" | ~90 bytes |
+
+Alternativ B är enklast men havererar om en produkt tas bort (alla efterföljande produkter markeras som "nya"). Alternativ D ger mest data men timestamp tillför lite värde för Mikael (bryr sig om ny/inte ny, inte när). Alternativ A är bäst: stabilt, enkelt, tillräckligt.
+
+**Motargument mot A (URL-baserat):** Om en butik ändrar sin URL-struktur (t.ex. redirect) blir produkten "ny" igen trots att den setts förut. Risk: låg (URL:er ändras sällan och vi lagrar den URL som finns i PRODUCTS, inte den som butiken redirectar till).
 
 ```javascript
 const seenUrls = new Set(JSON.parse(localStorage.getItem('vilgot-seen-urls') || '[]'));
@@ -145,7 +156,7 @@ GSAP är 100% gratis för alla sedan Webflow-sponsringen. Ingen begränsning fö
 | # | Approach | Storlek | Styrka | Nackdel |
 |---|---|---|---|---|
 | A | GSAP + canvas-confetti | 70 KB + 0 (redan importerad) | Branschstandard, alla effekter, timeline, easing | Störst |
-| B | anime.js + canvas-confetti | 17 KB + 0 | Lättvikt, enkel API | Mindre flexibel än GSAP, sämre dokumentation |
+| B | anime.js + canvas-confetti | 17 KB + 0 | Lättvikt, enkel API (källa: https://animejs.com/documentation/) | Färre inbyggda easing-funktioner än GSAP (källa: animejs.com vs gsap.com/docs/v3/Eases) |
 | C | Bara CSS @keyframes + canvas-confetti | 0 KB extra | Ingen dependency | Begränsat: ingen stagger, ingen timeline, ingen elastic ease |
 | D | Inga animationer | 0 KB | Snabbast laddtid | Ingen wow-faktor (Mikael sa "extrema animationer") |
 | E | Motion One (motionone.org) | 18 KB | Modern, Web Animations API | Mindre community, färre exempel. Källa: motionone.org |
@@ -162,7 +173,7 @@ GSAP + canvas-confetti ger mest wow-faktor. canvas-confetti redan importerad i p
 | Elastic scale bounce | `gsap.from(card, { scale: 0, ease: "elastic.out(1, 0.5)", duration: 1.2 })` | Hög |
 | Glow pulse runt kortet | CSS `@keyframes glow { box-shadow: 0 0 5px gold → 0 0 30px gold }` | Hög |
 | "NY!" badge med shimmer | CSS gradient-animation + `animation: shimmer 1.5s infinite` | Medel |
-| Konfetti per kort | `confetti({ particleCount: 80, origin: { x, y } })` | Extrem |
+| Konfetti per kort | `confetti({ particleCount: 80, origin: { x, y } })` (källa: https://github.com/catdad/canvas-confetti) | Extrem |
 | Stagger (kort efter kort) | `gsap.from(cards, { y: 50, opacity: 0, stagger: 0.15 })` | Hög (visuell kaskad) |
 
 ### Prestanda
@@ -220,6 +231,19 @@ Normalisering KRÄVS. Föreslagna storlegsgrupper:
 
 93% av produkterna har SEK-priser. Prisfilter i SEK fungerar direkt för nästan alla. De 3 USD-produkterna kan konverteras med statisk kurs (1 USD = 10.5 kr). De 2 "Varierar" exkluderas från prisfilter.
 
+### UI-alternativ
+
+| # | Approach | Fördel | Nackdel |
+|---|---|---|---|
+| A | Filter-pills (knappar) | Visuellt tydligt, snabbt att klicka | Tar plats med 36 brands. Kräver "Övriga"-collapse. |
+| B | Sökbar dropdown per kategori | Skalbart, funkar med 100+ brands | Mer klick (öppna dropdown, söka, välja). Mindre discoverable. |
+| C | Faceted search (sidebar med checkboxar) | Standard i e-handel (Zalando, Amazon) | Tar mycket horisontell plats. Kräver responsiv layout. Desktop-fokus. |
+| D | Frisökning (ett sökfält som filtrerar namn+brand+sektion) | Enklast, 1 input-fält | Kräver att användaren vet vad den söker. Inget browsing-stöd. |
+| E | Prisslider (range input) | Exakt prisval, visuellt tydligt | Komplicerat med blandade valutor. `<input type="range">` kräver min/max. |
+| F | Predefined prisintervall (pills) | Enkelt, inga slider-problem | Mindre flexibelt. Intervallgränserna kan kännas godtyckliga. |
+
+Källa för faceted search: https://www.nngroup.com/articles/faceted-search/ (Nielsen Norman Group, UX-research).
+
 ### UI-rekommendation
 
 Sticky filter-bar under headern med:
@@ -262,7 +286,7 @@ Animationer och filter-UI kan inte bedömas via research. En PoC ska testa:
 - localStorage: markera "nya" produkter, visa badge
 - Mobil-responsivitet (375px viewport)
 
-PoC-filen: `poc-redesign.html` (fristående, laddar GSAP från CDN, 5 hårdkodade produkter).
+PoC-filen: `poc/v1/index.html` (fristående, laddar GSAP från CDN, 5 hårdkodade produkter).
 Resultat avgör: vilka effekter som används, om GSAP behövs eller om anime.js/CSS räcker, om filter-pills ska bytas mot sökbar dropdown.
 
 ## Evidensluckor
@@ -271,7 +295,9 @@ Resultat avgör: vilka effekter som används, om GSAP behövs eller om anime.js/
 - **H&M blocking:** H&M kan ändra sin policy. Inte testat med cookies/headers. Låg risk (bilder redan nedladdade lokalt).
 - **Storleksnormalisering:** Kan missa framtida format som agenter lägger till. Lösning: fallback-grupp "Övrigt" för okända format.
 - **Mobil-UX för filter (ny):** Sticky filter-bar med pills kan ta för mycket vertikal plats på mobil (375px viewport). Inte testat. Alternativ: collapsible filter-bar som fälls ihop till en "Filter"-knapp på mobil. Kräver CSS media query `@media (max-width: 768px)`.
-- **GSAP laddtidspåverkan (ny):** index.html är 69 KB. GSAP 3.13 min är 70 KB. Totalt 139 KB HTML+JS (exkl. bilder). GSAP laddas från CDN (cdnjs.cloudflare.com) och cachas efter första besök. Första laddning: +70 KB. Påverkan: försumbar på bredband (~50ms), märkbar på 3G (~500ms). Sajten används primärt av Mikael på WiFi. Acceptabelt.
+- **GSAP laddtidspåverkan:** index.html är 69 KB. GSAP 3.13 min är 70 KB. Totalt 139 KB HTML+JS (exkl. bilder). GSAP laddas från CDN (cdnjs.cloudflare.com) och cachas efter första besök. Första laddning: +70 KB. Påverkan: försumbar på bredband (~50ms), märkbar på 3G (~500ms). Sajten används primärt av Mikael på WiFi. Acceptabelt.
+- **add-item.sh kompatibilitet:** add-item.sh och json-helper.py injekterar produkter i `const PRODUCTS = [...]` i index.html. Om rendering-logiken bryts ut till app.js måste PRODUCTS-arrayen fortfarande ligga i index.html (eller skripten ändras). Om sektioner tas bort: add-item.sh har `--section` flagga och `VALID_SECTIONS` whitelist. Sektionerna behålls som metadata (filterfält), men rendering ignorerar dem. Ingen ändring i add-item.sh krävs.
+- **Auto-discovery i platt lista:** Agenter lägger till produkter med `--section`. I platt lista renderas produkten utan sektionsrubrik men section-fältet finns kvar för filtrering. Agenter behöver inte ändras. Nya produkter hamnar sist i PRODUCTS-arrayen, visas först med reverse().
 
 ## Fakta vs slutledning vs spekulation
 
@@ -285,4 +311,8 @@ Resultat avgör: vilka effekter som används, om GSAP behövs eller om anime.js/
 | Platt lista kräver filter | Rimlig slutledning (80 ogrupperade kort är oöverskådligt) |
 | Statiska växelkurser räcker | Rimlig slutledning (bara 3 USD-produkter av 80) |
 | Mobil filter-bar kan ta för mycket plats | Spekulation (inte testat) |
-| anime.js har sämre dokumentation än GSAP | Rimlig slutledning (baserat på community-storlek, inte systematisk jämförelse) |
+| anime.js har färre easing-funktioner än GSAP | Fakta (animejs.com/documentation vs gsap.com/docs/v3/Eases) |
+| URL:er i localStorage är stabila vid remove | Fakta (vi lagrar URL från PRODUCTS, inte live-URL) |
+| URL:er kan ändras vid butiks-redirect | Rimlig slutledning (låg risk, sällan) |
+| Faceted search är standard i e-handel | Fakta (NNGroup: nngroup.com/articles/faceted-search/) |
+| add-item.sh påverkas inte av platt lista | Fakta (section-fältet behålls, rendering ignorerar det) |

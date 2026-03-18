@@ -1,7 +1,7 @@
 # Plan: Fixa alla produkter utan bilder
 
 Skapad: 2026-03-18
-Research: `research-site-redesign.md`
+Research: `research/research-site-redesign.md`
 
 ## Mål
 
@@ -221,7 +221,7 @@ Om en bild visar fel plagg eller är trasig: felsök, fixa, push, verifiera igen
 
 ## Steg 6: Uppdatera dokument
 
-- `research-site-redesign.md`: uppdatera med H&M-ersättningsdata
+- `research/research-site-redesign.md`: uppdatera med H&M-ersättningsdata
 - `beslut-site-redesign.md`: uppdatera beslut 1 (ersätt istället för ta bort)
 - `STATUS.md`: uppdatera antal produkter, bildstatus
 - `plan-fix-missing-images.md`: markera alla steg som ✅ med resultat

@@ -1,7 +1,7 @@
 # Plan: Fixa pre-existing sajt-problem
 
 Skapad: 2026-03-17
-Research: `research-site-issues.md`
+Research: `research/research-site-issues.md`
 
 ## Mål
 

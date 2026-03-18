@@ -12,45 +12,45 @@ Alla produkter ska ha riktiga bilder. Sajten ska ha platt lista (inga sektioner)
 
 ### 1. Bilder för alla produkter ✅ KLAR
 
-- Research: `research-site-redesign.md` (sektion 1)
+- Research: `research/research-site-redesign.md` (sektion 1)
 - Beslut: `beslut-site-redesign.md` (punkt 1-3)
 - Plan: `plan-fix-missing-images.md`
 - Resultat: 80 produkter, alla med bilder. 5 utgångna H&M ersatta med 4 aktuella. Chrome-verifierat 83/83 bilder.
 
 ### 1b. Sajt-problem (samlingslänkar, trasig bild) ✅ KLAR
 
-- Research: `research-site-issues.md`
+- Research: `research/research-site-issues.md`
 - Plan: `plan-fix-site-issues.md`
 - Resultat: 10 samlingslänkar→produktsidor, 1 trasig bild fixad (.webp→.jpg), 1 utgången Jacadi borttagen. Chrome-verifierat.
 
 ### 2. Platt lista (ta bort sektioner)
 
-- Research: `research-site-redesign.md` (sektion 2)
+- Research: `research/research-site-redesign.md` (sektion 2)
 - Beslut: `beslut-site-redesign.md` (punkt 4)
 - Plan: ⬜
 - **Beroende:** Filtrering måste implementeras samtidigt (platt lista utan filter = oöverskådligt).
 
 ### 3. Sortering senast tillagda först
 
-- Research: `research-site-redesign.md` (sektion 3)
+- Research: `research/research-site-redesign.md` (sektion 3)
 - Beslut: `beslut-site-redesign.md` (punkt 5)
 - Plan: ⬜
 
 ### 4. localStorage för sedda produkter
 
-- Research: `research-site-redesign.md` (sektion 4)
+- Research: `research/research-site-redesign.md` (sektion 4)
 - Beslut: `beslut-site-redesign.md` (punkt 6)
 - Plan: ⬜
 
 ### 5. Extrema animationer för nya produkter
 
-- Research: `research-site-redesign.md` (sektion 5)
+- Research: `research/research-site-redesign.md` (sektion 5)
 - Beslut: `beslut-site-redesign.md` (punkt 7)
 - Plan: ⬜
 
 ### 6. Filtrering
 
-- Research: `research-site-redesign.md` (sektion 6)
+- Research: `research/research-site-redesign.md` (sektion 6)
 - Beslut: `beslut-site-redesign.md` (punkt 8)
 - Plan: ⬜
 - **Beroende:** Implementeras samtidigt som platt lista.
