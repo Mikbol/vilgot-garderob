@@ -198,9 +198,9 @@ Pass: alla HTTP 200.
 
 ## Steg 9: Uppdatera dokument
 
-- `PLAN-auto-discovery.md`: markera steg 12 (full körning) som ✅, uppdatera acceptanskriterier med resultat
+- `plan-auto-discovery.md`: markera steg 12 (full körning) som ✅, uppdatera acceptanskriterier med resultat
 - `STATUS.md`: uppdatera antal produkter, testresultat, status
-- `PLAN-fullkorning.md`: skriv resultat i botten av filen
+- `plan-fullkorning.md`: skriv resultat i botten av filen
 - `index.md` (workspace): uppdatera om beskrivningen ändrats
 
 **Tid:** 2 min.
@@ -315,7 +315,7 @@ Körningen genomförd enligt plan. Alla steg passerade.
 | 6. Städa bilder | ✅ 0 föräldralösa |
 | 7. Push + Pages | ✅ Pushat, Pages status "built" |
 | 8. Live-verifiering | ✅ WebFetch: 76 produkter. curl: 5 nya bilder HTTP 200. Chrome: ej ansluten (noterat som lucka). |
-| 9. Dokument | ✅ PLAN-auto-discovery.md + STATUS.md uppdaterade |
+| 9. Dokument | ✅ plan-auto-discovery.md + STATUS.md uppdaterade |
 | 10. launchd | ✅ Installerad, dagligen kl 05:45 |
 
 ### Nya produkter tillagda

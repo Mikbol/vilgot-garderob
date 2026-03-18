@@ -224,7 +224,7 @@ Om en bild visar fel plagg eller är trasig: felsök, fixa, push, verifiera igen
 - `research-site-redesign.md`: uppdatera med H&M-ersättningsdata
 - `beslut-site-redesign.md`: uppdatera beslut 1 (ersätt istället för ta bort)
 - `STATUS.md`: uppdatera antal produkter, bildstatus
-- `PLAN-fix-missing-images.md`: markera alla steg som ✅ med resultat
+- `plan-fix-missing-images.md`: markera alla steg som ✅ med resultat
 
 **Tid:** 3 min.
 

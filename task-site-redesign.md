@@ -2,61 +2,58 @@
 
 Skapad: 2026-03-17
 
-## Vad ska göras
+## Status: BESLUT (bilder KLAR, resten väntar på plan)
 
-### 1. Riktiga produktbilder för alla produkter
+## Mål
 
-11 produkter saknar bilder och visar text-placeholders istället:
-- 6 st H&M (skjorta+fluga-set, väst-set)
-- 4 st Accessoarer (flat caps, newsboy caps, hängsle-set)
-- 1 st Dressade Rompers (waistcoat tuxedo onesie)
+Alla produkter ska ha riktiga bilder. Sajten ska ha platt lista (inga sektioner), sortering senast tillagda först, localStorage för sedda produkter, extrema animationer för nya produkter, och filtrering.
 
-Varje produkt ska ha en riktig produktbild. Hämta från butikens sajt eller sök upp produkten och ladda ned bilden.
+## Flöde
 
-### 2. Ta bort kategorier/sektioner
+### 1. Bilder för alla produkter ✅ KLAR
 
-Idag grupperas produkter under 15 sektionsrubriker (The Tiny Universe, Lulu Babe, etc.). Byt till en platt lista utan sektioner. Alla produktkort i en enda ström.
+- Research: `research-site-redesign.md` (sektion 1)
+- Beslut: `beslut-site-redesign.md` (punkt 1-3)
+- Plan: `plan-fix-missing-images.md`
+- Resultat: 80 produkter, alla med bilder. 5 utgångna H&M ersatta med 4 aktuella. Chrome-verifierat 83/83 bilder.
 
-### 3. Sortering: senast tillagda först
+### 2. Platt lista (ta bort sektioner)
 
-Nya produkter ska hamna överst. Befintliga produkter sorteras i omvänd ordning (högst ID först). Agenter som lägger till produkter via add-item.sh ska automatiskt hamna högst upp.
+- Research: `research-site-redesign.md` (sektion 2)
+- Beslut: `beslut-site-redesign.md` (punkt 4)
+- Plan: ⬜
+- **Beroende:** Filtrering måste implementeras samtidigt (platt lista utan filter = oöverskådligt).
 
-### 4. LocalStorage: spåra sedda produkter
+### 3. Sortering senast tillagda först
 
-Spara vilka produkt-ID:n användaren sett i localStorage. Vid nästa sidladdning: jämför sparade ID:n med aktuella produkter. Produkter som inte fanns förra gången = "nya".
+- Research: `research-site-redesign.md` (sektion 3)
+- Beslut: `beslut-site-redesign.md` (punkt 5)
+- Plan: ⬜
+
+### 4. localStorage för sedda produkter
+
+- Research: `research-site-redesign.md` (sektion 4)
+- Beslut: `beslut-site-redesign.md` (punkt 6)
+- Plan: ⬜
 
 ### 5. Extrema animationer för nya produkter
 
-När sidan laddas och det finns produkter som användaren inte sett förut: visa dem med riktigt fräna animationer. Tänk wow-faktor, inte subtilt. Exempel:
-- Produktkortet flyger in från sidan
-- Glöd/pulse-effekt runt kortet
-- "NY!" badge med partikeleffekt
-- Konfetti eller liknande vid första visningen
-- Animationen ska köras en gång, sedan markeras produkten som "sedd" i localStorage
+- Research: `research-site-redesign.md` (sektion 5)
+- Beslut: `beslut-site-redesign.md` (punkt 7)
+- Plan: ⬜
 
 ### 6. Filtrering
 
-Användaren ska kunna filtrera produkter på:
-- Brand/märke
-- Prisintervall
-- Storlek
-- Typ (romper, kostym, accessoar, set, etc.)
-- "Bara nya" (produkter man inte sett)
+- Research: `research-site-redesign.md` (sektion 6)
+- Beslut: `beslut-site-redesign.md` (punkt 8)
+- Plan: ⬜
+- **Beroende:** Implementeras samtidigt som platt lista.
 
-Filtren ska vara synliga och enkla att använda. Kombinerbara (brand + pris + storlek samtidigt).
+## Nästa steg
 
-## Nuläge
-
-- 75 produkter, 67 med bilder, 11 med text-placeholders
-- 15 sektioner med rubriker och beskrivningar
-- Ingen sortering (ordning = ordning i PRODUCTS-arrayen)
-- Ingen localStorage
-- Ingen filtrering
-- Konfetti-animation finns redan vid sidladdning (ej kopplad till nya produkter)
+Skapa plan för punkt 2-6. Punkt 2+6 implementeras i samma steg (beroende). Punkt 3-5 kan göras separat eller ihop.
 
 ## Berör
 
 - `index.html` (rendering, CSS, JavaScript)
-- `add-item.sh` (kan behöva flagga `added_date` eller liknande)
-- `agents/product-scout.md` (om nya fält behövs)
 - Live-sajt: https://mikbol.github.io/vilgot-garderob/
