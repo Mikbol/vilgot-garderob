@@ -2,3 +2,7 @@ logs/
 .add-item.lock
 *.tmp
 index.html.bak
+.archived/
+.DS_Store
+__pycache__/
+*.pyc

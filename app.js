@@ -1,7 +1,7 @@
 // ===== VILGOTS GARDEROB - APP.JS =====
-// Rendering, filtrering, localStorage, animationer
+// Rendering, filtering, localStorage, animations
 
-// ===== localStorage: sedda produkter =====
+// ===== localStorage: seen products =====
 const SEEN_KEY = 'vilgot-seen-urls';
 let seenUrls;
 try {
@@ -264,7 +264,7 @@ function renderCard(p, idx) {
 function renderProducts() {
   const grid = document.getElementById('grid');
 
-  // Reverse: senast tillagda först
+  // Reverse: most recently added first
   const sorted = PRODUCTS.map(function(p, i) { return { product: p, idx: i }; }).reverse();
 
   let html = '';
@@ -347,7 +347,7 @@ function animateNewProducts() {
     }
   });
 
-  // Konfetti per nytt kort (med delay per kort)
+  // Confetti per new card (with delay per card)
   // Limit to first 10 cards to avoid confetti overload
   const maxConfetti = Math.min(newCards.length, 10);
   for (let i = 0; i < maxConfetti; i++) {

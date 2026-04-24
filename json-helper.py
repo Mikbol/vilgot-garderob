@@ -109,7 +109,7 @@ def cmd_list(args):
         json.dump(products, sys.stdout, indent=2, ensure_ascii=False)
         print()
     else:
-        print(f"Totalt: {len(products)} produkter\n")
+        print(f"Total: {len(products)} products\n")
         for p in products:
             tag = f" [{p['tag']}]" if p.get('tag') else ""
             price = p.get('price', '?')

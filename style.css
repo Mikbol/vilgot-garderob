@@ -144,7 +144,7 @@ header { animation: fadeIn 1s ease; }
   white-space: nowrap;
 }
 
-/* Mobil: collapse filter */
+/* Mobile: collapse filter */
 .filter-toggle {
   display: none;
   background: rgba(255,255,255,0.05);
@@ -642,7 +642,7 @@ html { scroll-behavior: smooth; }
   background: rgba(0,0,0,0.04);
 }
 
-/* ===== MOBILE: iPhone-optimerad ===== */
+/* ===== MOBILE: iPhone-optimized ===== */
 @media (max-width: 600px) {
   header h1 { font-size: 2rem; }
   header { padding: 2.5rem 0 2rem; margin-bottom: 1.5rem; }
@@ -674,14 +674,14 @@ html { scroll-behavior: smooth; }
   .grid { grid-template-columns: 1fr; }
 }
 
-/* Mellan-storlekar (tablet/stor mobil) */
+/* Mid sizes (tablet / large mobile) */
 @media (min-width: 601px) and (max-width: 900px) {
   .grid { grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
   header h1 { font-size: 2.8rem; }
   #content { padding: 1.5rem 1.2rem 3rem; }
 }
 
-/* Touch-enheter */
+/* Touch devices */
 @media (hover: none) {
   .card:hover { transform: none; box-shadow: none; }
   .card:hover .card-img { transform: none; filter: none; }

@@ -49,7 +49,7 @@ command -v curl >/dev/null 2>&1 || die "curl required"
 [ -f "$HTML_FILE" ] || die "index.html not found at $HTML_FILE"
 [ -f "$HELPER" ] || die "json-helper.py not found at $HELPER"
 
-# File lock to prevent concurrent modifications (macOS-kompatibel, mkdir är atomärt)
+# File lock to prevent concurrent modifications (macOS-compatible; mkdir is atomic)
 acquire_lock() {
     if ! mkdir "$LOCKFILE.d" 2>/dev/null; then
         die "Another add-item.sh is running. Try again."

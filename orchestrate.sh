@@ -1,18 +1,18 @@
 #!/bin/bash
-# orchestrate.sh - Kör OpenCode-agenter för produktsökning och pusha resultatet
+# orchestrate.sh - Run OpenCode agents for product discovery and push the result
 #
-# Användning:
-#   ./orchestrate.sh                    # Kör alla agenter
-#   ./orchestrate.sh --dry-run          # Visa utan att köra
-#   ./orchestrate.sh --single 0         # Kör bara agent 0
-#   ./orchestrate.sh --model MODEL      # Använd annan modell
-#   ./orchestrate.sh --no-push          # Kör men pusha inte
+# Usage:
+#   ./orchestrate.sh                    # Run all agents
+#   ./orchestrate.sh --dry-run          # Show without running
+#   ./orchestrate.sh --single 0         # Run only agent 0
+#   ./orchestrate.sh --model MODEL      # Use a different model
+#   ./orchestrate.sh --no-push          # Run but don't push
 
 set -euo pipefail
 
 SITE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Timeout-kommando: dg_timeout (DeGaming), timeout (Linux/coreutils), gtimeout (brew coreutils)
+# Timeout command: dg_timeout (DeGaming), timeout (Linux/coreutils), gtimeout (brew coreutils)
 TIMEOUT_BIN=""
 if command -v dg_timeout >/dev/null 2>&1; then
     TIMEOUT_BIN="dg_timeout"
@@ -24,14 +24,14 @@ fi
 LOG_DIR="$SITE_DIR/logs"
 DATE=$(date '+%Y-%m-%d_%H%M%S')
 
-# Konfigurerbart
-MODEL=""  # Tom = använd default från opencode.json
+# Configurable
+MODEL=""                       # Empty = use default from opencode.json
 TIMEOUT_SECS=180               # 3 min max per agent
 DRY_RUN=false
 NO_PUSH=false
 SINGLE_AGENT=""
 
-# Sökfokus per agent (5 agenter)
+# Per-agent search focus (5 agents)
 AGENT_FOCUSES=(
   "baby tuxedo suit formal outfit gentleman infant newborn"
   "baby bow tie suspender romper gentleman outfit bodysuit"
@@ -40,7 +40,7 @@ AGENT_FOCUSES=(
   "baby buster suit ceremony romper formal European designer"
 )
 
-# Roterande tillägg baserat på veckonummer (variation över tid)
+# Rotating extra based on week number (variation over time)
 WEEK_NUM=$(( $(date +%V) % 4 ))
 WEEKLY_EXTRAS=(
   "new arrivals spring 2026"
@@ -50,7 +50,7 @@ WEEKLY_EXTRAS=(
 )
 WEEKLY_EXTRA="${WEEKLY_EXTRAS[$WEEK_NUM]}"
 
-# Parse flaggor
+# Parse flags
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dry-run) DRY_RUN=true; shift ;;
@@ -58,26 +58,26 @@ while [[ $# -gt 0 ]]; do
     --single) SINGLE_AGENT="$2"; shift 2 ;;
     --model) MODEL="$2"; shift 2 ;;
     --timeout) TIMEOUT_SECS="$2"; shift 2 ;;
-    *) echo "Okänd flagga: $1" >&2; exit 1 ;;
+    *) echo "Unknown flag: $1" >&2; exit 1 ;;
   esac
 done
 
 mkdir -p "$LOG_DIR"
 
-# Kontrollera att opencode finns
+# Verify opencode is available
 command -v opencode >/dev/null 2>&1 || { echo "opencode not found in PATH" >&2; exit 1; }
 
-# Kontrollera att add-item.sh finns och fungerar
+# Verify add-item.sh exists and is executable
 [ -x "$SITE_DIR/add-item.sh" ] || { echo "add-item.sh not found or not executable" >&2; exit 1; }
 
-# Läs agent-prompten
+# Read agent prompt
 AGENT_PROMPT=$(cat "$SITE_DIR/agents/product-scout.md")
 
-# Bygg modell-flagga
+# Build model flag
 MODEL_FLAG=""
 [ -n "$MODEL" ] && MODEL_FLAG="--model $MODEL"
 
-# Funktion: kör en agent
+# Run a single agent
 run_agent() {
   local idx="$1"
   local focus="${AGENT_FOCUSES[$idx]}"
@@ -95,7 +95,7 @@ run_agent() {
 
 ---
 
-Ditt sökfokus för denna körning: $full_focus"
+Your search focus for this run: $full_focus"
 
   local start_time=$(date +%s)
   local exit_code=0
@@ -113,7 +113,7 @@ Ditt sökfokus för denna körning: $full_focus"
   local end_time=$(date +%s)
   local duration=$((end_time - start_time))
 
-  # Timeout-detektion: exit 124 (GNU timeout) eller duration >= TIMEOUT_SECS (dg_timeout returnerar 0)
+  # Timeout detection: exit 124 (GNU timeout) or duration >= TIMEOUT_SECS (dg_timeout returns 0)
   if [ "$exit_code" -eq 124 ] || ([ -n "$TIMEOUT_BIN" ] && [ "$duration" -ge "$TIMEOUT_SECS" ]); then
     echo "[$(date '+%H:%M:%S')] Agent $idx TIMEOUT after ${duration}s" | tee -a "$log_file"
   elif [ "$exit_code" -ne 0 ]; then
@@ -129,7 +129,7 @@ Ditt sökfokus för denna körning: $full_focus"
 
 cd "$SITE_DIR"
 
-# Produkter före
+# Products before
 BEFORE=$(./add-item.sh count 2>/dev/null || echo "0")
 
 echo "=== Product Discovery $(date) ==="
@@ -138,20 +138,20 @@ echo "Products before: $BEFORE"
 echo "Weekly extra: $WEEKLY_EXTRA"
 echo ""
 
-# Bestäm vilka agenter som körs
+# Decide which agents run
 if [ -n "$SINGLE_AGENT" ]; then
   INDICES=("$SINGLE_AGENT")
 else
   INDICES=($(seq 0 $((${#AGENT_FOCUSES[@]} - 1))))
 fi
 
-# Kör agenter sekventiellt (undviker OpenCode sessionsinterferens #4251)
+# Run agents sequentially (avoids OpenCode session interference #4251)
 FAILURES=0
 for idx in "${INDICES[@]}"; do
   run_agent "$idx" || FAILURES=$((FAILURES + 1))
 done
 
-# Produkter efter
+# Products after
 AFTER=$(./add-item.sh count 2>/dev/null || echo "0")
 NEW=$((AFTER - BEFORE))
 
@@ -176,7 +176,7 @@ elif [ "$NEW" -eq 0 ]; then
   echo "No new products. Nothing to commit."
 fi
 
-# Sammanfattning
+# Summary
 echo ""
 echo "=== Done ==="
 echo "New products: $NEW"
