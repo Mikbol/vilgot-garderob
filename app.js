@@ -1,27 +1,6 @@
 // ===== VILGOTS GARDEROB - APP.JS =====
-// Rendering, filtering, localStorage, animations
+// Rendering, filtering, animations
 
-// ===== localStorage: seen products =====
-const SEEN_KEY = 'vilgot-seen-urls';
-let seenUrls;
-try {
-  seenUrls = new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'));
-} catch (e) {
-  seenUrls = new Set();
-}
-
-function isNewProduct(p) {
-  return !seenUrls.has(p.url);
-}
-
-function saveSeen() {
-  try {
-    localStorage.setItem(SEEN_KEY, JSON.stringify(PRODUCTS.map(p => p.url)));
-    seenUrls = new Set(PRODUCTS.map(p => p.url));
-  } catch (e) {
-    // localStorage unavailable, graceful degradation
-  }
-}
 
 // ===== SIZE NORMALIZATION =====
 const SIZE_GROUPS = {
@@ -77,7 +56,7 @@ function matchPrice(priceStr, range) {
 }
 
 // ===== FILTER STATE =====
-const filters = { brand: 'all', size: 'all', price: 'all', onlyNew: false };
+const filters = { brand: 'all', size: 'all', price: 'all' };
 
 function applyFilters() {
   const cards = document.querySelectorAll('#grid .card');
@@ -88,8 +67,7 @@ function applyFilters() {
     const show =
       (filters.brand === 'all' || p.brand === filters.brand || (filters.brand === '__other__' && !isTopBrand(p.brand))) &&
       (filters.size === 'all' || getSizeGroup(p.size) === filters.size) &&
-      matchPrice(p.price, filters.price) &&
-      (!filters.onlyNew || isNewProduct(p));
+      matchPrice(p.price, filters.price);
     card.classList.toggle('hidden', !show);
     if (show) visible++;
   });
@@ -127,7 +105,7 @@ function initFilters() {
   // Count "other" brands
   const otherCount = PRODUCTS.filter(p => !isTopBrand(p.brand)).length;
   if (otherCount > 0) {
-    brandHtml += '<span class="pill" data-filter="brand" data-value="__other__">\u00d6vriga (' + otherCount + ')</span>';
+    brandHtml += '<span class="pill" data-filter="brand" data-value="__other__">Övriga (' + otherCount + ')</span>';
   }
   brandGroup.innerHTML = brandHtml;
 
@@ -147,29 +125,19 @@ function initFilters() {
   let priceHtml = '<label>Pris:</label>';
   priceHtml += '<span class="pill active" data-filter="price" data-value="all">Alla</span>';
   priceHtml += '<span class="pill" data-filter="price" data-value="low">&lt;300 kr</span>';
-  priceHtml += '<span class="pill" data-filter="price" data-value="mid">300\u2013700 kr</span>';
+  priceHtml += '<span class="pill" data-filter="price" data-value="mid">300–700 kr</span>';
   priceHtml += '<span class="pill" data-filter="price" data-value="high">&gt;700 kr</span>';
   priceGroup.innerHTML = priceHtml;
-
-  const newGroup = document.getElementById('newFilter');
-  const newCount = PRODUCTS.filter(p => isNewProduct(p)).length;
-  newGroup.innerHTML = '<span class="pill" data-filter="new" data-value="toggle">Bara nya (' + newCount + ')</span>';
 
   // Attach click handlers to all pills
   document.querySelectorAll('.filter-bar .pill').forEach(pill => {
     pill.addEventListener('click', function() {
       const filterType = this.dataset.filter;
       const value = this.dataset.value;
-
-      if (filterType === 'new') {
-        filters.onlyNew = !filters.onlyNew;
-        this.classList.toggle('active', filters.onlyNew);
-      } else {
-        filters[filterType] = value;
-        // Update active states for this filter group
-        this.closest('.filter-group').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-        this.classList.add('active');
-      }
+      filters[filterType] = value;
+      // Update active states for this filter group
+      this.closest('.filter-group').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
       applyFilters();
     });
   });
@@ -191,13 +159,7 @@ function escapeAttr(str) {
 }
 
 function renderCard(p, idx) {
-  const isNew = isNewProduct(p);
-  let html = '<div class="card' + (isNew ? ' new-product' : '') + '" data-idx="' + idx + '">';
-
-  // NY! badge
-  if (isNew) {
-    html += '<span class="new-badge shimmer">NY!</span>';
-  }
+  let html = '<div class="card" data-idx="' + idx + '">';
 
   // Carousel / image area
   const isSingle = !p.images || p.images.length <= 1;
@@ -254,7 +216,7 @@ function renderCard(p, idx) {
   html += '</div>';
 
   if (p.url) {
-    html += '<a class="buy-btn" href="' + escapeHtml(p.url) + '" target="_blank">K\u00f6p \u2192</a>';
+    html += '<a class="buy-btn" href="' + escapeHtml(p.url) + '" target="_blank">Köp →</a>';
   }
 
   html += '</div></div>';
@@ -330,49 +292,33 @@ function initCarousels() {
   });
 }
 
-// ===== ANIMATIONS (GSAP + canvas-confetti) =====
-function animateNewProducts() {
-  const newCards = document.querySelectorAll('.card.new-product:not(.hidden)');
-  if (newCards.length === 0) return;
-
-  // GSAP: elastic bounce in with stagger
-  gsap.from(newCards, {
-    scale: 0,
-    opacity: 0,
-    duration: 1,
-    ease: "elastic.out(1, 0.5)",
-    stagger: 0.15,
-    onComplete: function() {
-      newCards.forEach(function(card) { card.classList.add('glow'); });
-    }
+// ===== CONFETTI ON LOAD =====
+// Fires a staggered confetti burst over every card currently in the viewport.
+function celebrateOnLoad() {
+  const vh = window.innerHeight;
+  const vw = window.innerWidth;
+  const visible = Array.from(
+    document.querySelectorAll('#grid .card:not(.hidden)')
+  ).filter(card => {
+    const rect = card.getBoundingClientRect();
+    return rect.top < vh && rect.bottom > 0;
   });
-
-  // Confetti per new card (with delay per card)
-  // Limit to first 10 cards to avoid confetti overload
-  const maxConfetti = Math.min(newCards.length, 10);
-  for (let i = 0; i < maxConfetti; i++) {
-    (function(index) {
-      setTimeout(function() {
-        const card = newCards[index];
-        if (!card) return;
-        const rect = card.getBoundingClientRect();
-        // Only confetti if card is in viewport
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          confetti({
-            particleCount: 60,
-            spread: 50,
-            origin: {
-              x: (rect.left + rect.width / 2) / window.innerWidth,
-              y: (rect.top + rect.height / 2) / window.innerHeight
-            },
-            colors: ['#c9a96e', '#ff6b6b', '#fff'],
-            gravity: 1.2,
-            scalar: 0.8,
-          });
-        }
-      }, index * 200 + 500);
-    })(i);
-  }
+  visible.forEach((card, index) => {
+    setTimeout(() => {
+      const r = card.getBoundingClientRect();
+      confetti({
+        particleCount: 60,
+        spread: 50,
+        origin: {
+          x: (r.left + r.width / 2) / vw,
+          y: (r.top + r.height / 2) / vh,
+        },
+        colors: ['#c9a96e', '#ff6b6b', '#fff'],
+        gravity: 1.2,
+        scalar: 0.8,
+      });
+    }, index * 120);
+  });
 }
 
 // ===== THEME TOGGLE =====
@@ -397,20 +343,36 @@ function initBackToTop() {
   });
 }
 
+// ===== SCROLL RESTORE =====
+// The initial HTML ships an empty #grid that app.js fills in. Chrome's native
+// scroll restoration runs before that, so the document is too short to scroll
+// into. Take manual control: persist scrollY to sessionStorage and restore it
+// after renderProducts has populated the grid.
+const SCROLL_KEY = 'vilgot-scroll-y';
+
+function initScrollRestore() {
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.addEventListener('beforeunload', function() {
+    sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+  });
+}
+
+function restoreScroll() {
+  const y = parseInt(sessionStorage.getItem(SCROLL_KEY) || '0', 10);
+  if (y <= 0) return;
+  // behavior: 'instant' bypasses CSS `scroll-behavior: smooth`, which would
+  // animate the jump and leave scrollY at 0 when celebrateOnLoad samples.
+  window.scrollTo({ top: y, left: 0, behavior: 'instant' });
+}
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', function() {
-  // Theme
+  initScrollRestore();
   initTheme();
-
-  // Render products
   renderProducts();
-
-  // Back to top
+  restoreScroll();
   initBackToTop();
-
-  // Animate new products after 300ms
-  setTimeout(animateNewProducts, 300);
-
-  // Save seen after 3 seconds (after animations complete)
-  setTimeout(saveSeen, 3000);
+  setTimeout(celebrateOnLoad, 300);
 });

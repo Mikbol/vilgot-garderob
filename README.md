@@ -17,7 +17,22 @@ Static lookbook site with an automated product-discovery pipeline for gentleman-
 - `opencode.json` — opencode config
 - `logs/` — per-agent run logs (gitignored)
 
-## Running
+## Local development
+
+The site is fully static — HTML, CSS, JS, and images, no backend, no
+`fetch`, no build step. `PRODUCTS` is inlined as a JSON array in
+`index.html`; GSAP and canvas-confetti are loaded from CDNs.
+
+Open `index.html` directly:
+
+```
+open index.html
+```
+
+When editing CSS/JS, use DevTools → Network → "Disable cache" to skip
+Chrome's cache without reloading query strings.
+
+## Discovery pipeline
 
 Manual:
 ```
@@ -30,3 +45,20 @@ Manual:
 Scheduled: `launchd` job `local.vilgot-garderob.discovery` runs `orchestrate.sh` daily at 05:45.
 Plist lives at `~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist`.
 stdout/stderr: `/tmp/vilgot-discovery.{log,err}`.
+
+Load, unload, or inspect the scheduler:
+
+```
+launchctl load   ~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist
+launchctl unload ~/Library/LaunchAgents/local.vilgot-garderob.discovery.plist
+launchctl list | grep vilgot-garderob
+```
+
+Run one agent locally against the production files:
+
+```
+./add-item.sh count                        # current product count
+./add-item.sh sections                     # valid sections
+./add-item.sh exists --url "https://..."   # dedupe check
+./orchestrate.sh --single 0 --no-push      # one agent, no git push
+```

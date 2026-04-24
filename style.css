@@ -494,42 +494,6 @@ footer {
   transform: translateY(-2px) scale(1.1);
 }
 
-/* ===== NY! BADGE ===== */
-.new-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-  color: white;
-  padding: 0.25rem 0.6rem;
-  border-radius: 12px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  z-index: 10;
-}
-
-.new-badge.shimmer {
-  background-size: 200% 100%;
-  background-image: linear-gradient(90deg, #ee5a24 0%, #ff9a76 50%, #ee5a24 100%);
-  animation: badgeShimmer 1.5s ease-in-out infinite;
-}
-
-@keyframes badgeShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Glow animation for new products */
-.glow {
-  animation: glowPulse 2s ease-in-out 3;
-}
-
-@keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 5px rgba(212, 168, 75, 0.3); }
-  50% { box-shadow: 0 0 25px rgba(212, 168, 75, 0.6), 0 0 50px rgba(212, 168, 75, 0.2); }
-}
-
 /* ===== ANIMATIONS ===== */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(30px); }

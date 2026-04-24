@@ -12,7 +12,7 @@ set -euo pipefail
 
 SITE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Timeout command: dg_timeout (DeGaming), timeout (Linux/coreutils), gtimeout (brew coreutils)
+# Timeout command: dg_timeout (custom timeout), timeout (Linux/coreutils), gtimeout (brew coreutils)
 TIMEOUT_BIN=""
 if command -v dg_timeout >/dev/null 2>&1; then
     TIMEOUT_BIN="dg_timeout"
