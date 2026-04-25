@@ -21,24 +21,29 @@
       <h1>Vilgots Garderob</h1>
       <div class="subtitle">Gentleman Collection</div>
       <div class="note">Kostym, smoking, fluga &amp; h&auml;ngslen i miniformat. Vardagsplagg med vuxen-vibe.</div>
-      <div class="product-count" id="productCount"></div>
+      <div class="product-count"><span id="productCountNumber"></span><span class="product-count-suffix"> handplockade plagg</span></div>
     </header>
 
     <!-- Size Note -->
-    <div class="size-note">
-      <h3>Om storlekar</h3>
-      <p>Vilgot &auml;r i storlek ~44-50 (prematur). De flesta gentleman-kl&auml;der b&ouml;rjar p&aring; 56 eller 62. Han ber&auml;knas vara p&aring; sjukhuset 4-6 veckor och v&auml;xer in i 62 under den tiden. Custom-plagg fr&aring;n Bee Rose/Etsy kan best&auml;llas i prematurstorlek direkt.</p>
-    </div>
+    <details class="size-note">
+      <summary><h3>Om storlekar</h3></summary>
+      <div class="size-note-body">
+        <p id="sizeNoteIntro"></p>
+        <ul id="sizeProjection" class="size-projection"></ul>
+      </div>
+    </details>
 
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-      <button class="filter-toggle" onclick="toggleFilters()">Filter</button>
-      <div class="filter-groups" id="filterGroups">
+    <!-- Filter: compact pill that expands into a floating panel -->
+    <div class="filter-bar closed" id="filterBar">
+      <button class="filter-toggle" onclick="toggleFilters()" type="button">
+        <span class="filter-toggle-label">Filter</span>
+        <span class="filter-toggle-count" id="filterCount"></span>
+      </button>
+      <div class="filter-panel" id="filterGroups">
         <div class="filter-group" id="brandFilters"></div>
         <div class="filter-group" id="sizeFilters"></div>
         <div class="filter-group" id="priceFilters"></div>
       </div>
-      <span class="filter-count" id="filterCount"></span>
     </div>
 
     <!-- Product Grid -->
@@ -48,7 +53,7 @@
     <button class="back-top" id="backTop" onclick="window.scrollTo({top:0})">&#8593;</button>
 
     <footer id="footer">
-      Vilgots Garderob &middot; Gentleman Collection &middot; <span id="footerCount"></span> plagg &middot; Kuraterat mars 2026
+      Vilgots Garderob &middot; Gentleman Collection &middot; <span id="footerCount"></span> plagg &middot; Handplockat mars 2026
     </footer>
   </div>
 
